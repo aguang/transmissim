@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-
 import os
 import sys, string
 import random as rand
 import dendropy
 
 # simulate sequences from specified gene tree
-def simulate_sequences(species_tree, root_file, species_tree_file, num_genefams, seq_type, out_dir):
+def simulate_sequences(species_tree, root_file, species_tree_file, num_genefams,out_dir):
     print "Step 2: Sequence Evolution Based on Species Tree"
 
     """Simulate sequences from set of gene trees using iSG. Rates of evolution drawn from random distributions."""
@@ -17,59 +16,46 @@ def simulate_sequences(species_tree, root_file, species_tree_file, num_genefams,
         with open(infile, 'w') as fout:
             fout.write('[:' + root_file + str(i+1) + '] ')
             fout.write('" Label ' + '" ')
-#            i.write(fout, 'newick', suppress_rooting=True)
-            # suppress edge lengths is temporary hack to deal with fact that iSG does not support having a final branch length at the end
-            # which is the format dendropy outputs, i.e. (a: 0.1, b: 0.1):0.0;
-
             s = species_tree.as_string('newick')
             s = s[5:] # get rid of rooting
             last_parens = s.rfind(')')
             fout.write(s[:last_parens+1])
             fout.write(';\n')
             fout.close()
-
         outfile = infile + '_sequences'
+        paramfile = infile + '_params'
 
-        # simulate sequences with iSG
-        # iSG options:
-        # substitution matrix
-        # -m (string) HKY, F84 for nucleotides, PAM, JTT, MTREV, CPREV for amino acid
+        # set up iSG simulation parameters
         options = ''
         matrix = ''
-        if seq_type == 'nucleotide':
-            matrix = {
-                0: 'HKY',
-                1: 'F84'
-                }[rand.randint(0,1)]
         # rate substitution parameters
+        # -m (string) HKY, F84 for substitution matrix
         # -a (float) gamma rate heterogeneity OR
         # -c (list) codon position heterogeneity OR
         # -g (int) numbe categories for discrete gamma-dist rate heterogeneity (b/w 2 and 32)
-        if seq_type == 'codon':
-            rate_type = rand.randint(0, 2)
-            options = {
-                0: '-a ' + str(rand.uniform(0.01, 2)),
-                1: '-c ' + ','.join([str(rand.uniform(0.1,0.5)),str(rand.uniform(0.01,0.1)),str(rand.uniform(0.5,0.99))]),
-                2: '-a ' + str(rand.uniform(0.01, 2)) + '-g ' + str(rand.randint(2,32))
-                }[rate_type]
-            matrix = {
-                0: 'HKY',
-                1: 'F84'
-                }[rand.randint(0,1)]
-        if seq_type == 'protein':
-            matrix = {
-                0: 'PAM',
-                1: 'JTT',
-                2: 'MTREV',
-                3: 'CPREV'
-                }[rand.randint(0,3)]
+        rate_type = rand.randint(0, 2)
+        options = {
+            0: '-a ' + str(rand.uniform(0.01, 2)),
+            1: '-c ' + ','.join([str(rand.uniform(0.1,0.5)),str(rand.uniform(0.01,0.1)),str(rand.uniform(0.5,0.99))]),
+            2: '-a ' + str(rand.uniform(0.01, 2)) + ' -g ' + str(rand.randint(2,32))
+            }[rate_type]
+        matrix = {
+            0: 'HKY',
+            1: 'F84'
+            }[rand.randint(0,1)]
+        with open(paramfile, 'a') as p:
+            p.write("codon\n")
+            p.write("rate type: " + options + "\n")
+            p.write("matrix: " + matrix + "\n")
 
         # invariance parameter
         # -i (float) proportion of invariable sites
         inv_rate = '-i ' + str(rand.random())
+        with open(paramfile, 'a') as p:
+            p.write("invariance rate: " + inv_rate + "\n")
+            p.write("---------------\n")
 
-        ret = os.system('./indel-seq-gen -m %s %s -d 010000 --outfile %s < %s' % (matrix, options, outfile, infile))
-#        ret = os.system('./indel-seq-gen -m HKY --outfile %s < %s' % (outfile, infile))
+        ret = os.system('./indel-seq-gen -m %s %s --outfile %s < %s' % (matrix, options, outfile, infile))
         if ret != 0:
             raise OSError, 'indel-seq-gen failed with code %s ' % ret
 
@@ -79,19 +65,22 @@ def write_root(root_file, num_genefams):
     with open(root_file, 'r') as fin:
         count = 1;
         while count <= num_genefams:
-            line = fin.readline().split('|')
+            line = fin.readline()
+            if not line:
+                break
+            line = line.split('|')
             seq = line[1].upper()
             l = len(seq) - 1
-            if l > 600: # only take sequences that will create at least 200 amino acids = ~180 kmers each
-                out = root_file + str(count)
-                with open(out, 'w') as fout:
-                    fout.write(str(l))
-                    fout.write('\n')
-                    fout.write('0'*l+'\n')
-                    fout.write(seq)
-                    fout.close()
-                count = count + 1
-
+#            if l > 200: # only take amino acid sequences with at least 200
+#            if l > 600: # only take sequences with at least 600
+            out = root_file + str(count)
+            with open(out, 'w') as fout:
+                fout.write(str(l))
+                fout.write('\n')
+                fout.write('0'*l+'\n')
+                fout.write(seq)
+                fout.close()
+            count = count + 1
 
 if __name__ == "__main__":
 
@@ -103,7 +92,6 @@ if __name__ == "__main__":
     ds = ' [%(default)s]'
     parser.add_argument('-sp', '--species_tree', help='shared species tree')
     parser.add_argument('-n', '--num_genefams', default=10, help='number of genes to generate')
-    parser.add_argument('--seq_type', default='codon', help='type of evolution, choices are nucleotide, codon, protein')
     parser.add_argument('-r', '--root_seq', help='root sequence file, should have all the root sequences you will intend to use, format should be id|sequence')
     parser.add_argument('-w', '--wr_flag', default=0, help='flag for whether root sequences need to be written or not')
     parser.add_argument('-d', '--out_dir', help='out directory')
@@ -113,7 +101,6 @@ if __name__ == "__main__":
     species_tree_file = opts.species_tree
     species_tree = dendropy.Tree.get_from_path(species_tree_file, schema="newick", rooted=True)
     num_genefams = int(opts.num_genefams)
-    seq_type = opts.seq_type
     root_seq = opts.root_seq
     wr_flag = int(opts.wr_flag)
     out_dir = opts.out_dir
@@ -121,4 +108,4 @@ if __name__ == "__main__":
     if wr_flag == 1:
         write_root(root_seq, num_genefams)
 
-    simulate_sequences(species_tree, root_seq, species_tree_file, num_genefams, seq_type, out_dir)
+    simulate_sequences(species_tree, root_seq, species_tree_file, num_genefams, out_dir)
