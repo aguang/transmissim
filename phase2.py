@@ -2,13 +2,30 @@
 import os
 import sys, string
 import phase1
-import dendropy
 import random
+from ete2 import Tree
 
 # generate gene tree from shared species tree
-def generate_gene_tree(species_tree, birth_rate, death_rate, num_trees, out):
-    print "Step 2: Generating gene trees based on species tree"
-    os.system("Rscript genetree.R %s %s %f %f %s" % (species_tree, num_trees, birth_rate, death_rate, out))
+def filter_tree(tree):
+    tree.resolve_polytomy(recursive=True)
+    D = tree.search_nodes(name="D")
+    for death in D:
+        P = death.up
+        if P.is_root():
+            death.detach()
+            children = P.children
+            if children:
+                child = P.children[0] #assumes bifurcating tree
+                child.dist = P.dist + child.dist
+                P.delete()
+            else:
+                return 0
+        else:
+            G = P.up
+            G.dist=G.dist+P.dist
+            death.detach()
+            P.delete()
+    return tree
 
 if __name__ == "__main__":
 
@@ -38,12 +55,16 @@ if __name__ == "__main__":
     out_dir = opts.out_dir
 
     if wr_flag == 1:
-        phase1.write_root(root_seq, num_genefams)
+        phase1.write_root(root_seq, num_trees)
 
-    out = out_dir + species_tree_file
-    generate_gene_tree(species_tree_file, birth_rate, death_rate, num_trees, out)
-    for i in range(1,num_trees+1):
-        gene_tree_file = out + str(i)
-        gene_tree = dendropy.Tree.get_from_path(gene_tree_file, schema="newick", rooted=True, allow_duplicate_taxon_labels=True)
-        tree_file = gene_tree_file + "_"
-        phase1.simulate_sequences(gene_tree, root_seq, tree_file, 1, out_dir)
+#    out = out_dir + species_tree_file
+#    generate_gene_tree(species_tree_file, birth_rate, death_rate, num_trees, out)
+    for i in range(0,num_trees):
+        gene_tree_file = species_tree_file + str(i)
+        gene_tree = Tree(gene_tree_file, format=1)
+        gene_tree = filter_tree(gene_tree)
+        if gene_tree == 0:
+            continue
+        out = out_dir + "tree" + str(i)
+        r = root_seq + str(i+1)
+        phase1.simulate_sequences(gene_tree, r, gene_tree_file, out)
