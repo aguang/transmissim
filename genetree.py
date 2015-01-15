@@ -1,5 +1,5 @@
 import numpy as np
-from numpy.random import random_sample
+from numpy.random import gamma
 import math
 import ete2
 
@@ -89,10 +89,17 @@ if __name__ == "__main__":
     sp = ete2.Tree(species_tree_file)
     num_genefams = int(opts.num_genefams)
     genetrees = []
-    
-    lam = 0.0025
-    mu = 0.0025
+
+    change_rate = gamma(4, .0004, num_genefams)
     for i in range(num_genefams):
+        # attribute set up for simulation
+        lam = change_rate[i]/3
+        mu = change_rate[i] - lam
+        print "tree number: ", i
+        print "change rate: ", change_rate[i]
+        print "birth rate: ", lam
+        print "death rate: ", mu
+        print "----------"
         genetree = sp.copy()
         descendants = genetree.get_descendants('preorder')
         internal_order=0
@@ -103,13 +110,13 @@ if __name__ == "__main__":
         root = genetree.get_tree_root()
         root.add_feature('copy_num', 1)
 
+        # actual simulation
         for node in descendants:
             E = node
             S = node.up
             generate(E, S, lam, mu, genetree)
         genetrees.append(genetree)
-        lam = lam + .0025
-        mu = mu + .0025
         
         out = out_dir + species_tree_file + str(i)
+#        print genetree
         genetree.write(format=1, outfile=out)
