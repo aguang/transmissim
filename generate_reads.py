@@ -4,7 +4,6 @@
 
 import sys, getopt, string
 import itertools
-import pprint #tmp for pretty printing
 import os
 
 # separates genes for each species and places them into a species dictionary
@@ -39,33 +38,33 @@ def sepGenes(iFile, numGenes):
 # writes all genes for each species with accompanying species ID into a reference.fa file along with
 # a BED file for RNAseqreadsimulator
 def writeSpecies(directory, speciesDict):
-    pos = 0
     for speciesKey in speciesDict:
         outf = os.path.join(directory, speciesKey[1:] + '.fa')
-        outb = os.path.join(directory, speciesKey[1:] + '.bed')
+        bed = os.path.join(directory, speciesKey[1:] + '.bed')
         explv = os.path.join(directory, speciesKey[1:] + '_explv.txt')
         outr = os.path.join(directory, speciesKey[1:])
         fa = open(outf, 'w')
         fa.write(">chr1\n")
-        bed = open(outb, 'w')
+        outb = open(bed, 'w')
+        pos = 0
         for seq in speciesDict[speciesKey]:
             # write BED
             l = len(seq[1])
             end = pos + l
+            outb.write("chr1\t%i\t%i\t%s\t0\t+\t%i\t%i\t0\t1\t%i\t0\n" % (pos, end, seq[0][1:],pos,pos,l))
             pos = end
-            bed.write("chr1\t%i\t%i\t%s\t0\t+\t%i\t%i\t0\t1\t%i\t0\n" % (pos, end, seq[0][1:],pos,pos,l))
 
             # write fasta
             fa.write(seq[1])
         fa.close()
-        bed.close()
+        outb.close()
 
         path = os.path.dirname(sys.argv[0])
         path = os.path.abspath(path)
         posbias = os.path.join(path, 'posbias.txt')
         readerr = os.path.join(path, 'readerror.txt')
-        ret = os.system('python %s/genexplvprofile.py %s > %s' % (path, outb, explv))
-        ret = os.system('python %s/gensimreads.py -e %s -b %s -p 200,20 %s | python %s/getseqfrombed.py -b %s -f A -r 0.01 - %s | python splitfasta.py -o %s' % (path, explv, posbias, outb, path, readerr, outf, outr))
+        ret = os.system('python %s/genexplvprofile.py %s > %s' % (path, bed, explv))
+        ret = os.system('python %s/gensimreads.py -e %s -b %s -l 100 -p 200,20 %s | python %s/getseqfrombed.py -b %s -f A -r 0.01 -l 100 - %s | python splitfasta.py -o %s' % (path, explv, posbias, bed, path, readerr, outf, outr))
 
 def main(argv):
     numGenes = 0
