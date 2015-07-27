@@ -4,15 +4,15 @@ import sys, string
 import random as rand
 from ete2 import Tree
 
-# simulate sequences from specified gene tree
-def simulate_sequences(tree, root_file, tree_file, out_dir):
+# simulate sequences from specified tree
+def simulate_sequences(tree, root_file, tree_file, out):
     """Simulate sequences from set of gene trees using iSG. Rates of evolution drawn from random distributions."""
     # write tree_file in [:root_file] "Label" (tree) format
-    infile = out_dir
+    infile = out
     with open(infile, 'w') as fout:
         fout.write('[:' + root_file + '] ')
         fout.write('" Label ' + '" ')
-        fout.write("{10, 0}")
+        fout.write("{9, .06, indel-length-dist.txt}")
         s=tree.write(format=5)
         fout.write(s)
         fout.write('\n')
@@ -50,10 +50,11 @@ def simulate_sequences(tree, root_file, tree_file, out_dir):
     path = os.path.dirname(sys.argv[0])
     path = os.path.abspath(path)
     ret = os.system('%s/indel-seq-gen -m %s %s --outfile %s < %s' % (path, matrix, options, outfile, infile))
-#            raise OSError, 'indel-seq-gen failed with code %s ' % ret
+#    raise OSError, 'indel-seq-gen failed with code %s ' % ret
 
+"""
 def write_root(root_file, num_genefams):
-    """Write root sequences in iSG format by pulling from given file with root sequences"""
+    Write root sequences in iSG format by pulling from given file with root sequences
     print "Step 1: Writing root sequences in indelSeqGen format"
     with open(root_file, 'r') as fin:
         count = 1;
@@ -74,31 +75,30 @@ def write_root(root_file, num_genefams):
                     fout.write(seq)
                     fout.close()
                 count = count + 1
+"""
 
 if __name__ == "__main__":
 
-    print "Warning: This script assumes your root sequence file corresponds to your sequence type choice, i.e. nucleotides or amino acids"
+#    print "Warning: This script assumes your root sequence file corresponds to your sequence type choice, i.e. nucleotides or amino acids"
 
     import argparse
     parser = argparse.ArgumentParser(description='phase1 of homology simulation pipeline')
 
     ds = ' [%(default)s]'
-    parser.add_argument('-sp', '--species_tree', help='shared species tree')
-    parser.add_argument('-n', '--num_genefams', default=10, help='number of genes to generate')
-    parser.add_argument('-r', '--root_seq', help='root sequence file, should have all the root sequences you will intend to use, format should be id|sequence')
-    parser.add_argument('-w', '--wr_flag', default=0, help='flag for whether root sequences need to be written or not')
-    parser.add_argument('-d', '--out_dir', help='out directory')
+    parser.add_argument('-t', '--tree', help='tree for simulation')
+    parser.add_argument('-r', '--root_seq', help='root sequence file, should be in a format suitable for iSG, if not rerun script with -w 1 to turn the write_root flag on')
+#    parser.add_argument('-w', '--wr_flag', default=0, help='flag for whether root sequences need to be written or not')
+    parser.add_argument('-d', '--out', help='out directory')
 
     opts = parser.parse_args()
 
-    species_tree_file = opts.species_tree
-    species_tree = Tree(species_tree_file)
-    num_genefams = int(opts.num_genefams)
+    tree_file = opts.tree
+    tree = Tree(tree_file)
     root_seq = opts.root_seq
-    wr_flag = int(opts.wr_flag)
-    out_dir = opts.out_dir
+#    wr_flag = int(opts.wr_flag)
+    out = opts.out
 
-    if wr_flag == 1:
-        write_root(root_seq, num_genefams)
+#    if wr_flag == 1:
+#        write_root(root_seq)
 
-    simulate_sequences(species_tree, root_seq, species_tree_file, num_genefams, out_dir)
+    simulate_sequences(tree, root_seq, tree_file, out)
