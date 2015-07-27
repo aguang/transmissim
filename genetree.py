@@ -69,7 +69,29 @@ def generate(E, S, lam, mu, genetree):
         """
     E.add_feature('copy_num', k)
 
-    
+def filter_tree(tree):
+    """
+    removes deletions from the generated gene tree
+    """
+    tree.resolve_polytomy(recursive=True)
+    D = tree.search_nodes(name="D")
+    for death in D:
+        P = death.up
+        if P.is_root():
+            death.detach()
+            children = P.children
+            if children:
+                child = P.children[0] #assumes bifurcating tree
+                child.dist = P.dist + child.dist
+                P.delete()
+            else:
+                return 0
+        else:
+            G = P.up
+            G.dist=G.dist+P.dist
+            death.detach()
+            P.delete()
+    return tree    
     
 
 if __name__ == "__main__":
@@ -90,16 +112,19 @@ if __name__ == "__main__":
     num_genefams = int(opts.num_genefams)
     genetrees = []
 
-    change_rate = gamma(4, .0004, num_genefams)
+    change_rate = gamma(.625, .03, num_genefams) # 30 mya
+#    change_rate = gamma(4, .0004, num_genefams) 1mya
     for i in range(num_genefams):
         # attribute set up for simulation
         lam = change_rate[i]/3
         mu = change_rate[i] - lam
+        """
         print "tree number: ", i
         print "change rate: ", change_rate[i]
         print "birth rate: ", lam
         print "death rate: ", mu
         print "----------"
+        """
         genetree = sp.copy()
         descendants = genetree.get_descendants('preorder')
         internal_order=0
@@ -115,8 +140,11 @@ if __name__ == "__main__":
             E = node
             S = node.up
             generate(E, S, lam, mu, genetree)
+            filter_tree(genetree)
         genetrees.append(genetree)
-        
+
+        # gene tree $i will be written into out_dir/species_tree_file${i}
         out = out_dir + species_tree_file + str(i)
-#        print genetree
         genetree.write(format=1, outfile=out)
+
+        
