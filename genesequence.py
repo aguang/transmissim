@@ -12,7 +12,7 @@ def simulate_sequences(tree, root_file, tree_file, out):
     with open(infile, 'w') as fout:
         fout.write('[:' + root_file + '] ')
         fout.write('" Label ' + '" ')
-        fout.write("{9, .06, indel-length-dist.txt}")
+        fout.write("{9, .0012, indel-length-dist.txt}")
         s=tree.write(format=5)
         fout.write(s)
         fout.write('\n')
