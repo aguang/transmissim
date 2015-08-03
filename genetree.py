@@ -40,33 +40,6 @@ def generate(E, S, lam, mu, genetree):
                 k = k - 1
                 del C[copy_num]
         else: break
-        """
-        print "tbegin is: ", tbegin
-        print "tend is: ", tend
-        tbirth=np.random.exponential(scale=1/(k*lam), size=1)[0]
-        tdeath=np.random.exponential(scale=1/(k*mu), size=1)[0]
-        if tbirth < tdeath and tbirth < tend and tbegin < tbirth:
-            copy_num = np.random.randint(k);
-            parent = C[copy_num].up
-            original = C[copy_num].detach()
-            new_child = parent.add_child(name='B', dist=tbirth)
-            new_child.add_child(original, dist=tend-tbirth)
-            copy = original.copy()
-            new_child.add_child(copy,dist=tend-tbirth)
-            k = k + 1
-            C.append(copy)
-            tbegin = tbirth
-        elif tdeath < tbirth and tdeath < tend and tdeath > tbegin:
-            copy_num = np.random.randint(k)
-            parent = C[copy_num].up
-            C[copy_num].detach()
-            parent.add_child(name='D', dist=tdeath)
-            k = k - 1
-            tbegin = tdeath
-            del C[copy_num]
-        else:
-            break
-        """
     E.add_feature('copy_num', k)
 
 def filter_tree(tree):
@@ -140,7 +113,11 @@ if __name__ == "__main__":
             E = node
             S = node.up
             generate(E, S, lam, mu, genetree)
-            filter_tree(genetree)
+
+        # remove deletions from gene tree
+        filter_tree(genetree)
+        if genetree == 0:
+            continue
         genetrees.append(genetree)
 
         # gene tree $i will be written into out_dir/species_tree_file${i}

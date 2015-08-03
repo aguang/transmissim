@@ -5,7 +5,7 @@ import random as rand
 from ete2 import Tree
 
 # simulate sequences from specified tree
-def simulate_sequences(tree, root_file, tree_file, out):
+def simulate_sequences(tree, root_file, out):
     """Simulate sequences from set of gene trees using iSG. Rates of evolution drawn from random distributions."""
     # write tree_file in [:root_file] "Label" (tree) format
     infile = out
@@ -93,7 +93,7 @@ if __name__ == "__main__":
     opts = parser.parse_args()
 
     tree_file = opts.tree
-    tree = Tree(tree_file)
+    tree = Tree(tree_file, format=1)
     root_seq = opts.root_seq
 #    wr_flag = int(opts.wr_flag)
     out = opts.out
@@ -101,4 +101,4 @@ if __name__ == "__main__":
 #    if wr_flag == 1:
 #        write_root(root_seq)
 
-    simulate_sequences(tree, root_seq, tree_file, out)
+    simulate_sequences(tree, root_seq, out)

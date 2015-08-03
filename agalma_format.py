@@ -14,29 +14,37 @@ import os
 def sepGenes(iFile, numGenes):
     speciesDict = {}
     geneID = 0
-    for i in range(1,numGenes+1):
+    for i in range(0,numGenes):
         f = iFile + str(i) + '_sequences.seq'
         try:
             with open(f, 'r') as fin:
                 # read lines in chunks of n
                 # format will be:
             
-                #   >species_ID
+                #   >species_ID-geneID
                 #   ACTGACTGNNNNNNN
+                duplicates = {}
                 for key, group in itertools.groupby(fin, lambda line: line.startswith('>')):
                     if key:
                         header = next(group).strip()
                     else:
                         lines=''.join(group).strip()
                         geneName = header + '-' + str(geneID)
+
+                        # hacky way of identifying and differentiating gene duplicates
+                        if geneName in duplicates:
+                            geneName = geneName + '-01'
+                        else:
+                            duplicates[geneName] = 0
+
                         if header in speciesDict:
                             speciesDict[header].append((geneName, lines))
                         else:
                             speciesDict[header] = [(geneName, lines)]
             geneID = geneID + 1
         except:
-            print "only ", geneID, " gene families existing in directory, input was ", num_genefams, " num_genefams, please check that either number of gene families match up or that you are in the right directory"
-            break
+            print geneID, " gene family not found, skipping"
+            geneID = geneID + 1
     return speciesDict
 
 # writes all genes for each species with accompanying species ID
