@@ -3,6 +3,7 @@
 # generate reads from gene sequences
 
 import sys, getopt, string
+import random
 import itertools
 import os
 
@@ -37,13 +38,14 @@ def sepGenes(iFile, numGenes):
 
 # writes all genes for each species with accompanying species ID into a reference.fa file along with
 # a BED file for RNAseqreadsimulator
+# then writes as a fastq CASAVA file
 def writeSpecies(directory, speciesDict):
     for speciesKey in speciesDict:
         # establish file paths
-        outf = os.path.join(directory, speciesKey[1:] + '.fa')
-        bed = os.path.join(directory, speciesKey[1:] + '.bed')
-        explv = os.path.join(directory, speciesKey[1:] + '_explv.txt')
         outr = os.path.join(directory, speciesKey[1:])
+        outf = outr + '.fa'
+        bed = outr + '.bed'
+        explv = outr + '_explv.txt'
 
         # write BED and fasta file
         fa = open(outf, 'w')
@@ -72,15 +74,15 @@ def writeSpecies(directory, speciesDict):
 
         # turn fasta files into fastq files with highest possible Phred quality scores
         # and CASAVA headers
+        lane = random.randint(1,3)
+        tile = random.randint(1, 2000)
+        make_headers(outr, 1, lane, tile)
+        make_headers(outr, 2, lane, tile)
 
-        lane = randint(1,3)
-        tile = randint(1, 2000)
-        make_headers(outf, 1, lane, tile)
-        make_headers(outf, 2, lane, tile)
-
+# make CASAVA headers
 def make_headers(read, paired_num, lane, tile):
-    fasta = os.path.join(read, '_', paired_num, '.fa')
-    fastq = os.path.join(read, '_', paired_num, '.fq')
+    fasta = read + '_' + str(paired_num) + '.fa'
+    fastq = read + '_' + str(paired_num) + '.fq'
     with open(fasta, 'r') as fa:
         fq = open(fastq, 'w')
         for key, group in itertools.groupby(fa, lambda line: line.startswith('>')):
@@ -88,15 +90,16 @@ def make_headers(read, paired_num, lane, tile):
                 header = next(group).strip()
             else:
                 lines = ''.join(group).strip()
+                num_bases = len(lines)
 
                 splits = header.rsplit('_',4)
                 read_num = splits[2]
-                gene_num = splits[4].split('-')[1]
+                gene_num = splits[0].split('-')[1]
 
-            fq.write('@SIM-12345:1:ABCDEFGHI:%i:%i:%s:%s %i:N:0:ATCACG', (lane, tile, gene_num, read_num, paired_num))
-            fq.write(lines)
-            # need to finish up writing tildes
-        
+                fq.write('@SIM-12345:1:ABCDEFGHI:%i:%i:%s:%s %i:N:0:ATCACG\n' % (lane, tile, gene_num, read_num, paired_num))
+                fq.write(lines+'\n')
+                fq.write('+\n')
+                fq.write('~'*num_bases + '\n')        
 
 def main(argv):
     numGenes = 0
@@ -106,7 +109,7 @@ def main(argv):
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hi:d:n:", ["ifile="])
     except getopt.error, msg:
-        print 'agalma_format.py -i <sequenceFile> -n <numGenes> -d <directory>'
+        print 'rawreads.py -i <sequenceFile> -n <numGenes> -d <directory>'
         sys.exit(2)
     # process arguments
     iFile = []
@@ -122,7 +125,6 @@ def main(argv):
 
     speciesDict = sepGenes(inExt, numGenes)
     writeSpecies(directory, speciesDict)
-#    pprint.pprint(speciesDict)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
