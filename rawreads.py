@@ -90,6 +90,7 @@ def make_headers(read, paired_num, lane, tile):
                 header = next(group).strip()
             else:
                 lines = ''.join(group).strip()
+                lines = lines.translate(None, '\n')
                 num_bases = len(lines)
 
                 splits = header.rsplit('_',4)
