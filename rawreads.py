@@ -100,7 +100,7 @@ def make_headers(read, paired_num, lane, tile):
                 fq.write('@SIM-12345:1:ABCDEFGHI:%i:%i:%s:%s %i:N:0:ATCACG\n' % (lane, tile, gene_num, read_num, paired_num))
                 fq.write(lines+'\n')
                 fq.write('+\n')
-                fq.write('~'*num_bases + '\n')        
+                fq.write('C'*num_bases + '\n')        
 
 def main(argv):
     numGenes = 0
