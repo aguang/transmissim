@@ -18,7 +18,6 @@ def simulate_sequences(tree, root_file, out):
         fout.write('\n')
         fout.close()
     outfile = infile + '_sequences'
-    paramfile = infile + '_params'
 
     # set up iSG simulation parameters
     options = ''
@@ -28,24 +27,12 @@ def simulate_sequences(tree, root_file, out):
     # -a (float) gamma rate heterogeneity OR
     # -c (list) codon position heterogeneity OR
     # -g (int) number categories for discrete gamma-dist rate heterogeneity (b/w 2 and 32)
-    rate_type = rand.randint(0, 2)
-    options = {
-        0: '-a ' + str(rand.uniform(0.01, 2)),
-        1: '-c ' + ','.join([str(rand.uniform(0.1,0.5)),str(rand.uniform(0.01,0.1)),str(rand.uniform(0.5,0.99))]),
-        2: '-a ' + str(rand.uniform(0.01, 2)) + ' -g ' + str(rand.randint(2,32))
-        }[rate_type]
+    options = '-a 0.8473'
     matrix = 'HKY'
-    with open(paramfile, 'a') as p:
-        p.write("codon\n")
-        p.write("rate type: " + options + "\n")
-        p.write("matrix: " + matrix + "\n")
         
     # invariance parameter
     # -i (float) proportion of invariable sites
-    inv_rate = '-i ' + str(rand.random())
-    with open(paramfile, 'a') as p:
-        p.write("invariance rate: " + inv_rate + "\n")
-        p.write("---------------\n")
+    inv_rate = '-i .2577'
 
     path = os.path.dirname(sys.argv[0])
     path = os.path.abspath(path)
