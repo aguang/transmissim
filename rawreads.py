@@ -3,6 +3,7 @@
 # generate reads from gene sequences
 
 import sys, getopt, string
+import numpy as np
 import random
 import itertools
 import os
@@ -10,7 +11,7 @@ import os
 # separates genes for each species and places them into a species dictionary
 def sepGenes(iFile, numGenes):
     speciesDict = {}
-    geneID = 0
+    geneID = 1
     for i in range(0,numGenes):
         f = iFile + str(i) + '_sequences.seq'
         try:
@@ -22,14 +23,18 @@ def sepGenes(iFile, numGenes):
                 #   ACTGACTGNNNNNNN
                 for key, group in itertools.groupby(fin, lambda line: line.startswith('>')):
                     if key:
-                        header = next(group).strip()
+                        header = next(group).strip().split('_')
+                        species = header[0]
+                        geneCopy = header[1]
+                        individual = header[2]
                     else:
                         lines=''.join(group).strip()
-                        geneName = header + '-' + str(geneID)
-                        if header in speciesDict:
-                            speciesDict[header].append((geneName, lines))
+                        geneName = species + '-gene' + str(geneID) + '-copy' + geneCopy
+
+                        if species in speciesDict:
+                            speciesDict[species].append((geneName, lines))
                         else:
-                            speciesDict[header] = [(geneName, lines)]
+                            speciesDict[species] = [(geneName, lines)]
             geneID = geneID + 1
         except:
             print geneID, " gene family not found, skipping"
@@ -70,7 +75,7 @@ def writeSpecies(directory, speciesDict):
         posbias = os.path.join(path, 'posbias.txt')
         readerr = os.path.join(path, 'readerror.txt')
         ret = os.system('python %s/genexplvprofile.py %s > %s' % (path, bed, explv))
-        ret = os.system('python %s/gensimreads.py -e %s -b %s -l 100 -p 200,20 %s | python %s/getseqfrombed.py -b %s -f A -r 0.01 -l 100 - %s | python splitfasta.py -o %s' % (path, explv, posbias, bed, path, readerr, outf, outr))
+        ret = os.system('python %s/gensimreads.py -e %s -l 100 -n 1000 -p 200,20 %s | python %s/getseqfrombed.py -b %s -f A -r 0.01 -l 100 - %s | python splitfasta.py -o %s' % (path, explv, bed, path, readerr, outf, outr))
 
         # turn fasta files into fastq files with highest possible Phred quality scores
         # and CASAVA headers
@@ -83,6 +88,7 @@ def writeSpecies(directory, speciesDict):
 def make_headers(read, paired_num, lane, tile):
     fasta = read + '_' + str(paired_num) + '.fa'
     fastq = read + '_' + str(paired_num) + '.fq'
+    qual_range = '0?@ABCDEFGH'
     with open(fasta, 'r') as fa:
         fq = open(fastq, 'w')
         for key, group in itertools.groupby(fa, lambda line: line.startswith('>')):
@@ -100,7 +106,9 @@ def make_headers(read, paired_num, lane, tile):
                 fq.write('@SIM-12345:1:ABCDEFGHI:%i:%i:%s:%s %i:N:0:ATCACG\n' % (lane, tile, gene_num, read_num, paired_num))
                 fq.write(lines+'\n')
                 fq.write('+\n')
-                fq.write('C'*num_bases + '\n')        
+                qual_indices = np.random.binomial(10, 0.9, num_bases)
+                qualities = ''.join(map(lambda x:qual_range[x], qual_indices))
+                fq.write(qualities + '\n')        
 
 def main(argv):
     numGenes = 0
