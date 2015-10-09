@@ -12,7 +12,7 @@ def simulate_sequences(tree, root_file, out):
     with open(infile, 'w') as fout:
         fout.write('[:' + root_file + '] ')
         fout.write('" Label ' + '" ')
-        fout.write("{9, .0012, indel-length-dist.txt}")
+        fout.write("{9, .0012, indel-length-dist.txt} ")
         s=tree.write(format=5)
         fout.write(s)
         fout.write('\n')
@@ -39,30 +39,30 @@ def simulate_sequences(tree, root_file, out):
     ret = os.system('%s/indel-seq-gen -m %s %s --outfile %s < %s' % (path, matrix, options, outfile, infile))
 #    raise OSError, 'indel-seq-gen failed with code %s ' % ret
 
-"""
 def write_root(root_file, num_genefams):
-    Write root sequences in iSG format by pulling from given file with root sequences
-    print "Step 1: Writing root sequences in indelSeqGen format"
+    "Write root sequences in iSG format by pulling from given file with root sequences"
     with open(root_file, 'r') as fin:
         count = 1;
         while count <= num_genefams:
-            line = fin.readline()
-            if not line:
-                break
-            line = line.split('|')
-            seq = line[1].upper()
-            l = len(seq) - 1
-#            if l > 200: # only take amino acid sequences with at least 200
-            if l > 600: # only take sequences with at least 600
-                out = root_file + str(count)
-                with open(out, 'w') as fout:
-                    fout.write(str(l))
-                    fout.write('\n')
-                    fout.write('0'*l+'\n')
-                    fout.write(seq)
-                    fout.close()
-                count = count + 1
-"""
+            header = fin.readline()
+            seq = fin.readline()
+            length = 0
+            out = root_file + str(count)
+            sequence = ''
+            with open(out, 'w') as fout:
+                while seq:
+                    l = len(seq) - 1
+                    length = length + l
+                    sequence = sequence + seq[:-1]
+                    print sequence
+                    seq = fin.readline()
+                    print seq
+                fout.write(str(length))
+                fout.write('\n')
+                fout.write('0'*length+'\n')
+                fout.write(sequence)
+                fout.close()
+            count = count + 1
 
 if __name__ == "__main__":
 
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     ds = ' [%(default)s]'
     parser.add_argument('-t', '--tree', help='tree for simulation')
     parser.add_argument('-r', '--root_seq', help='root sequence file, should be in a format suitable for iSG, if not rerun script with -w 1 to turn the write_root flag on')
-#    parser.add_argument('-w', '--wr_flag', default=0, help='flag for whether root sequences need to be written or not')
+    parser.add_argument('-w', '--wr_flag', default=0, help='flag for whether root sequences need to be written or not')
     parser.add_argument('-d', '--out', help='out directory')
 
     opts = parser.parse_args()
@@ -82,10 +82,10 @@ if __name__ == "__main__":
     tree_file = opts.tree
     tree = Tree(tree_file, format=1)
     root_seq = opts.root_seq
-#    wr_flag = int(opts.wr_flag)
+    wr_flag = int(opts.wr_flag)
     out = opts.out
 
-#    if wr_flag == 1:
-#        write_root(root_seq)
+    if wr_flag == 1:
+        write_root(root_seq, 1)
 
     simulate_sequences(tree, root_seq, out)
