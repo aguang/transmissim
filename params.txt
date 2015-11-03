@@ -1,0 +1,6 @@
+all	// simulate all, GT->GS, or GS->RR
+y	// save intermediate products? (y/n)
+===Read Simulation Parameters===
+-D /users/bguang/scratch/homology-testing/tests/stepanalysis/reference		// directory for out files
+-N 200		// number of genes
+-R 0		// read error
