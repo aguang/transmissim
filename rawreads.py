@@ -13,8 +13,8 @@ def sepGenes(iFile, numGenes):
     speciesDict = {}
     geneID = 1
     for i in range(0,numGenes):
-        #f = iFile + str(i) + '_sequences.seq'
-        f = iFile
+        f = iFile + str(i) + '_sequences.seq'
+        #f = iFile
         try:
             with open(f, 'r') as fin:
                 # read lines in chunks of n
@@ -24,16 +24,16 @@ def sepGenes(iFile, numGenes):
                 #   ACTGACTGNNNNNNN
                 for key, group in itertools.groupby(fin, lambda line: line.startswith('>')):
                     if key:
-                        species = next(group).strip()
-#                        header = next(group).strip().split('_')
-#                        species = header[0]
-#                        geneCopy = header[1]
-#                        individual = header[2]
+#                        species = next(group).strip()
+                        header = next(group).strip().split('_')
+                        species = header[0]
+                        geneCopy = header[1]
+                        individual = header[2]
                     else:
                         lines=''.join(group).strip()
-#                        geneName = species + '-gene' + str(geneID) + '-copy' + geneCopy
-                        geneName = species
-                        print geneName
+                        geneName = species + '-gene' + str(geneID) + '-copy' + geneCopy
+#                        geneName = species
+#                        print geneName
                  
                         if species in speciesDict:
                             speciesDict[species].append((geneName, lines))
@@ -47,7 +47,7 @@ def sepGenes(iFile, numGenes):
 # writes all genes for each species with accompanying species ID into a reference.fa file along with
 # a BED file for RNAseqreadsimulator
 # then writes as a fastq CASAVA file
-def writeSpecies(directory, speciesDict):
+def writeSpecies(directory, speciesDict, read_err, path):
     for speciesKey in speciesDict:
         # establish file paths
         outr = os.path.join(directory, speciesKey[1:])
@@ -73,12 +73,11 @@ def writeSpecies(directory, speciesDict):
         outb.close()
 
         # run RNAseqreadsimulator
-        path = os.path.dirname(sys.argv[0])
         path = os.path.abspath(path)
         posbias = os.path.join(path, 'posbias.txt')
         readerr = os.path.join(path, 'readerror.txt')
         ret = os.system('python %s/genexplvprofile.py %s > %s' % (path, bed, explv))
-        ret = os.system('python %s/gensimreads.py -e %s -l 100 -n 1000000 -p 200,20 %s | python %s/getseqfrombed.py -l 100 - %s | python splitfasta.py -o %s' % (path, explv, bed, path, outf, outr))
+        ret = os.system('python %s/gensimreads.py -e %s -l 100 -n 1000000 -p 200,20 %s | python %s/getseqfrombed.py -l 100 -r %s - %s | python %s/splitfasta.py -o %s' % (path, explv, bed, path, read_err, outf, path, outr))
 
         # turn fasta files into fastq files with highest possible Phred quality scores
         # and CASAVA headers
@@ -111,32 +110,9 @@ def make_headers(read, paired_num, lane, tile):
                 fq.write('+\n')
                 qual_indices = np.random.binomial(10, 0.7, num_bases)
                 qualities = ''.join(map(lambda x:qual_range[x], qual_indices))
-                fq.write(qualities + '\n')        
+                fq.write(qualities + '\n')
 
-def main(argv):
-    numGenes = 0
-    inExt = ''
-    directory = ''
-    # parse command line options
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hi:d:n:", ["ifile="])
-    except getopt.error, msg:
-        print 'rawreads.py -i <sequenceFile> -n <numGenes> -d <directory>'
-        sys.exit(2)
-    # process arguments
-    iFile = []
-    for opt, arg in opts:
-        if opt in ("-i", "--inFile"):
-            # extension for sequence files
-            inExt = arg
-        if opt in ("-d", "--directory"):
-            # directory for out files
-            directory = arg
-        if opt in ("-n", "--numGenes"):
-            numGenes = int(arg)
+def main(gene_sequences, read_err, reads_out, num_genes, path):
 
-    speciesDict = sepGenes(inExt, numGenes)
-    writeSpecies(directory, speciesDict)
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
+    speciesDict = sepGenes(gene_sequences, num_genes)
+    writeSpecies(reads_out, speciesDict, read_err, path)

@@ -5,14 +5,16 @@ import random as rand
 from ete2 import Tree
 
 # simulate sequences from specified tree
-def simulate_sequences(tree, root_file, out):
+def simulate_sequences(tree, root_file, out, indel_file=""):
     """Simulate sequences from set of gene trees using iSG. Rates of evolution drawn from random distributions."""
     # write tree_file in [:root_file] "Label" (tree) format
     infile = out
     with open(infile, 'w') as fout:
         fout.write('[:' + root_file + '] ')
         fout.write('" Label ' + '" ')
-        fout.write("{9, .0012, indel-length-dist.txt}")
+#        fout.write("{9, .0012, indel-length-dist.txt}")
+        if indel_file:
+            fout.write("{9, .0012, %s}" % (indel_file))
         s=tree.write(format=5)
         fout.write(s)
         fout.write('\n')
@@ -89,6 +91,7 @@ if __name__ == "__main__":
     parser.add_argument('-r', '--root_seq', help='root sequence file, should be in a format suitable for iSG, if not rerun script with -w 1 to turn the write_root flag on')
 #    parser.add_argument('-w', '--wr_flag', default=0, help='flag for whether root sequences need to be written or not')
     parser.add_argument('-d', '--out', help='out directory')
+    parser.add_argument('-i', '--indel_file', default='', help='indel length distribution file')
 
     opts = parser.parse_args()
 
@@ -97,8 +100,9 @@ if __name__ == "__main__":
     root_seq = opts.root_seq
 #    wr_flag = int(opts.wr_flag)
     out = opts.out
+    indel_file = opts.indel_file
 
 #    if wr_flag == 1:
 #        write_root(root_seq)
 
-    simulate_sequences(tree, root_seq, out)
+    simulate_sequences(tree, root_seq, out, indel_file)
