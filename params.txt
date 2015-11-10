@@ -1,6 +1,9 @@
 all	// simulate all, GT->GS, or GS->RR
 y	// save intermediate products? (y/n)
-===Read Simulation Parameters===
--D /users/bguang/scratch/homology-testing/tests/stepanalysis/reference		// directory for out files
--N 200		// number of genes
--R 0		// read error
+===Gene Sequence Parameters===
+	// directory for out files
+===Raw Reads Parameters===
+/users/bguang/repos/homology-testing	// directory with RNAseqreadsimulator scripts
+/users/bguang/scratch/homology-testing/tests/stepanalysis/reference		// directory for out files
+200		// number of genes
+0		// read error
