@@ -26,9 +26,10 @@ if __name__ == "__main__":
         reads_out = options[6]
         num_genes = int(options[7])
         read_err = options[8]
+        explv_flag = options[9]
 
         if analysis == "all" or "GT->GS":
-            os.system("simphy -RS 1 -RL F:200 -RG 1 -SB l:-14,1 -ST F:1000000 -SL F:15 -SP l:12,0.5 -SU e:10000000 -SG F:1 -V 0 -OM 1 -O /users/bguang/scratch/homology-testing/tests/stepanalysis/trees -OD 1 -OP 1 -OC 1 -ON 1 -CS 22")
+            os.system("simphy -RS 1 -RL F:200 -SB l:-14,1 -SL F:15 -SP F:1000000000 -SG F:1 -V 0 -OM 1 -O /users/bguang/scratch/homology-testing/tests/stepanalysis/trees -OD 1 -OP 1 -OC 1 -ON 1 -CS 22")
             for i in range(1,201):
                 j = str(i).zfill(3)
                 gene_tree = Tree("/users/bguang/scratch/homology-testing/tests/stepanalysis/trees/1/g_trees%s.trees" %(j))
@@ -37,5 +38,5 @@ if __name__ == "__main__":
             print "gene trees are in /users/bguang/scratch/homology-testing/tests/stepanalysis/trees"
             print "gene sequences are in ", gene_sequences
         if analysis == "all" or "GT->GS":
-            rawreads.main(gene_sequences, read_err, reads_out, num_genes, rsrs_path)
+            rawreads.main(gene_sequences, read_err, reads_out, num_genes, rsrs_path, explv_flag)
             print "raw reads are in ", reads_out
