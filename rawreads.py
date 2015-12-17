@@ -47,7 +47,7 @@ def sepGenes(iFile, numGenes):
 # writes all genes for each species with accompanying species ID into a reference.fa file along with
 # a BED file for RNAseqreadsimulator
 # then writes as a fastq CASAVA file
-def writeSpecies(directory, speciesDict, read_err, path, explv_flag='y'):
+def writeSpecies(directory, speciesDict, read_err, read_len, path, explv_flag='y'):
     for speciesKey in speciesDict:
         # establish file paths
         outr = os.path.join(directory, speciesKey[1:])
@@ -78,9 +78,9 @@ def writeSpecies(directory, speciesDict, read_err, path, explv_flag='y'):
         readerr = os.path.join(path, 'readerror.txt')
         if explv_flag=='y':
             ret = os.system('python %s/genexplvprofile.py %s > %s' % (path, bed, explv))
-            ret = os.system('python %s/gensimreads.py -e %s -l 100 -n 100000 -p 200,20 %s | python %s/getseqfrombed.py -l 100 -r %s - %s | python %s/splitfasta.py -o %s' % (path, explv, bed, path, read_err, outf, path, outr))
+            ret = os.system('python %s/gensimreads.py -e %s -l %s -n 100000 -p 200,20 %s | python %s/getseqfrombed.py -l %s -r %s - %s | python %s/splitfasta.py -o %s' % (path, explv, read_len, bed, path, read_len, read_err, outf, path, outr))
         else:
-            ret = os.system('python %s/gensimreads.py -l 100 -n 1000000 -p 200,20 %s | python %s/getseqfrombed.py -l 100 -r %s - %s | python %s/splitfasta.py -o %s' % (path, bed, path, read_err, outf, path, outr))
+            ret = os.system('python %s/gensimreads.py -l %s -n 100000 -p 200,20 %s | python %s/getseqfrombed.py -l %s -r %s - %s | python %s/splitfasta.py -o %s' % (path, read_len, bed, path, read_len, read_err, outf, path, outr))
 
         # turn fasta files into fastq files with highest possible Phred quality scores
         # and CASAVA headers
@@ -93,7 +93,7 @@ def writeSpecies(directory, speciesDict, read_err, path, explv_flag='y'):
 def make_headers(read, paired_num, lane, tile):
     fasta = read + '_' + str(paired_num) + '.fa'
     fastq = read + '_' + str(paired_num) + '.fq'
-    qual_range = '0?@ABCDEFGH'
+    qual_range = '0?@ABCDEFGH' # for Illumina1.5(double check)
     with open(fasta, 'r') as fa:
         fq = open(fastq, 'w')
         for key, group in itertools.groupby(fa, lambda line: line.startswith('>')):
@@ -115,7 +115,7 @@ def make_headers(read, paired_num, lane, tile):
                 qualities = ''.join(map(lambda x:qual_range[x], qual_indices))
                 fq.write(qualities + '\n')
 
-def main(gene_sequences, read_err, reads_out, num_genes, path, explv_flag):
+def main(gene_sequences, read_err, read_len, reads_out, num_genes, path, explv_flag):
 
     speciesDict = sepGenes(gene_sequences, num_genes)
-    writeSpecies(reads_out, speciesDict, read_err, path, explv_flag)
+    writeSpecies(reads_out, speciesDict, read_err, read_len, path, explv_flag)
