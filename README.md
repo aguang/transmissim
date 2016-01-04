@@ -2,13 +2,6 @@
 
 This repository aims to host a set of Python scripts that will simulate transcriptomes with known orthology/paralogy relationships, gene tree topologies, and species tree topologies. It will incorporate a summary statistics script for assessing phylogenetics program performance at the homolog clustering level and at the final tree reconstruction level.
 
-The pipeline is broken up into 2 phases:
-## Phase 1
-All gene trees share the same species tree, i.e. all homologs are orthologs. Codon evolution is simulated along each gene tree with biologically relevant parameters.
-
-## Phase 2
-All gene trees are simulated from the same species tree using a birth-death process with biologically relevant birth-and-death parameters. (Alternatively, user-supplied parameters) Codon evolution is simulated along each gene tree with biologically relevant parameters.
-
 #Pipeline Organization
 
 ##Gene Tree Simulation
@@ -24,6 +17,10 @@ Currently we have a single shared species tree based off of the gastropoda speci
 ##Sequence Simulation
 
 Sequence simulation for each gene tree is further done based off [indel-seq-gen](http://bioinfolab.unl.edu/~cstrope/iSG/) with root sequence input from assembled transcriptomes from the gastropod project.
+
+##Read Simulation
+
+Read simulation for each sequence read is done based off [flux simulator](http://sammeth.net/confluence/display/SIM/1+-+Introduction).
 
 ##Homology Assessment
 
