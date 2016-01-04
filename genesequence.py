@@ -98,6 +98,7 @@ if __name__ == "__main__":
     tree_file = opts.tree
     tree = Tree(tree_file, format=1)
     root_seq = opts.root_seq
+#    print os.path.abspath(root_seq)
 #    wr_flag = int(opts.wr_flag)
     out = opts.out
     indel_file = opts.indel_file
