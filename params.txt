@@ -4,8 +4,25 @@ y	// save intermediate products? (y/n)
 ===Gene Sequence Parameters===
 	// directory for out files
 ===Raw Reads Parameters===
-/users/bguang/repos/homology-testing	// directory with RNAseqreadsimulator scripts
-/users/bguang/scratch/homology-testing/tests/stepanalysis/reference_gs		// directory for out files
+/users/bguang/repos/barna/	// directory with flux simulator scripts
+PRO_FILE // file to which simulated expression values are written
+LIB_FILE // file to which expressed transcript molecules are written
+	 // number of expressed RNA molecules simulated
+0	 // expression: power law exponent
+15,500	 // expression: a in exponential decay
+15,500	 // expression: b in exponential decay
+NaN	 // mean deviation of simulated transcription starts (NaN to deactivate)
+NaN	 // scale parameter for poly-A tail lengths (Weibull distribution)
+NaN	 // shape parameter for poly-A tail lengths (Weibull distribution)
+false	 // switch reverse transcription on/off
+false	 // switch fragmentation on/off
+LIB_FILE_NAME	   // file from which fragments are read and to which new fragments are written
+false		   // switches filtering for fragment sizes on/off
+none		   // PCR distribution file. None disables
+LIB_FILE_NAME	   // input file with set of fragments from which reads are amplified
+SEQ_FILE_NAME	   // output file where genomic positions of sequenced reads are stored to
+		   // READ_NUMBER
+
 200		// number of genes
 500		// read length
 0		// read error
