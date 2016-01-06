@@ -47,7 +47,7 @@ def sepGenes(iFile, numGenes):
 # writes all genes for each species with accompanying species ID into a reference.fa file along with
 # a BED file for RNAseqreadsimulator
 # then writes as a fastq CASAVA file
-def writeSpecies(directory, speciesDict, read_err, read_len, path, explv_flag='y'):
+def writeAsBED(directory, speciesDict, read_err, read_len, path, explv_flag='y'):
     for speciesKey in speciesDict:
         # establish file paths
         outr = os.path.join(directory, speciesKey[1:])
@@ -76,6 +76,41 @@ def writeSpecies(directory, speciesDict, read_err, read_len, path, explv_flag='y
         path = os.path.abspath(path)
         posbias = os.path.join(path, 'posbias.txt')
         readerr = os.path.join(path, 'readerror.txt')
+        if explv_flag=='y':
+            ret = os.system('python %s/genexplvprofile.py %s > %s' % (path, bed, explv))
+            ret = os.system('python %s/gensimreads.py -e %s -l %s -n 100000 -p 200,20 %s | python %s/getseqfrombed.py -l %s -r %s - %s | python %s/splitfasta.py -o %s' % (path, explv, read_len, bed, path, read_len, read_err, outf, path, outr))
+        else:
+            ret = os.system('python %s/gensimreads.py -l %s -n 100000 -p 200,20 %s | python %s/getseqfrombed.py -l %s -r %s - %s | python %s/splitfasta.py -o %s' % (path, read_len, bed, path, read_len, read_err, outf, path, outr))
+
+        # turn fasta files into fastq files with highest possible Phred quality scores
+        # and CASAVA headers
+        lane = random.randint(1,3)
+        tile = random.randint(1, 2000)
+        make_headers(outr, 1, lane, tile)
+        make_headers(outr, 2, lane, tile)
+
+# writes GTF file format for species for use in flux simulator
+def writeAsGTF(directory, speciesDict, read_err, read_len, path):
+    for speciesKey in speciesDict:
+        # establish file paths
+        outr = os.path.join(directory, speciesKey[1:])
+        outf = outr + '.fa'
+        gtf = outr + '.gtf'
+
+        # write GTF
+        outg = open(gtf, 'w')
+        pos = 0
+        for seq in speciesDict[speciesKey]:
+            # write GTF
+            l = len(seq[1])
+            end = pos + l
+            outg.write("chr1\tSIMULATED\tCDS\t%i\t%i\t.\t+\t0\tgene_id \"%s\"; transcript_id \"%s\";" % (pos, end, seq[0][1:], seq[0][1:]))
+            pos = end + 1000
+        outg.close()
+
+        # run flux simulator
+        
+        path = os.path.abspath(path)
         if explv_flag=='y':
             ret = os.system('python %s/genexplvprofile.py %s > %s' % (path, bed, explv))
             ret = os.system('python %s/gensimreads.py -e %s -l %s -n 100000 -p 200,20 %s | python %s/getseqfrombed.py -l %s -r %s - %s | python %s/splitfasta.py -o %s' % (path, explv, read_len, bed, path, read_len, read_err, outf, path, outr))

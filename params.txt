@@ -1,8 +1,8 @@
-GS->RR	// simulate all, ST->GT, GT->GS, ST->GS or GS->RR
-/users/bguang/scratch/homology-testing/tests/stepanalysis/seqs/tree	// input directory (leave blank if none)
+all	// simulate all, ST->GT, GT->GS, ST->GS or GS->RR
+	// input directory (leave blank if none)
 y	// save intermediate products? (y/n)
 ===Gene Sequence Parameters===
-	// directory for out files
+/users/bguang/scratch/homology-testing/tests/newstep/genesequences	// directory for out files
 ===Raw Reads Parameters===
 /users/bguang/repos/barna/	// directory with flux simulator scripts
 PRO_FILE // file to which simulated expression values are written
@@ -22,8 +22,3 @@ none		   // PCR distribution file. None disables
 LIB_FILE_NAME	   // input file with set of fragments from which reads are amplified
 SEQ_FILE_NAME	   // output file where genomic positions of sequenced reads are stored to
 		   // READ_NUMBER
-
-200		// number of genes
-500		// read length
-0		// read error
-n		// use explv script? (y/n)

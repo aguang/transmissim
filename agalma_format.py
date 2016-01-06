@@ -4,6 +4,7 @@
 # designed specifically for how I've set up indelseqgen
 # JULY 2014: combined agalma_format and simmod.py to create tool for creating sequences in agalma pipeline format
 # added species naming on original tree
+# OCTOBER 2015: modified to work with SimPhy naming convention
 
 import sys, getopt, string
 import itertools
@@ -13,8 +14,8 @@ import os
 # separates genes for each species and places them into a species dictionary
 def sepGenes(iFile, numGenes):
     speciesDict = {}
-    geneID = 0
-    for i in range(0,numGenes):
+    geneID = 1
+    for i in range(1,numGenes):
         f = iFile + str(i) + '_sequences.seq'
         try:
             with open(f, 'r') as fin:
@@ -26,21 +27,18 @@ def sepGenes(iFile, numGenes):
                 duplicates = {}
                 for key, group in itertools.groupby(fin, lambda line: line.startswith('>')):
                     if key:
-                        header = next(group).strip()
+                        header = next(group).strip().split('_')
+                        species = header[0]
+                        geneCopy = header[1]
+                        individual = header[2]
                     else:
                         lines=''.join(group).strip()
-                        geneName = header + '-' + str(geneID)
+                        geneName = species + '-gene' + str(geneID) + '-copy' + geneCopy
 
-                        # hacky way of identifying and differentiating gene duplicates
-                        if geneName in duplicates:
-                            geneName = geneName + '-01'
+                        if species in speciesDict:
+                            speciesDict[species].append((geneName, lines))
                         else:
-                            duplicates[geneName] = 0
-
-                        if header in speciesDict:
-                            speciesDict[header].append((geneName, lines))
-                        else:
-                            speciesDict[header] = [(geneName, lines)]
+                            speciesDict[species] = [(geneName, lines)]
             geneID = geneID + 1
         except:
             print geneID, " gene family not found, skipping"
@@ -58,31 +56,6 @@ def writeSpecies(directory, speciesDict):
             f.write(seq[1] + '\n')
         f.close()
 
-def main(argv):
-    numGenes = 0
-    inExt = ''
-    directory = ''
-    # parse command line options
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hi:d:n:", ["ifile="])
-    except getopt.error, msg:
-        print 'agalma_format.py -i <sequenceFile> -n <numGenes> -d <directory>'
-        sys.exit(2)
-    # process arguments
-    iFile = []
-    for opt, arg in opts:
-        if opt in ("-i", "--inFile"):
-            # extension for sequence files
-            inExt = arg
-        if opt in ("-d", "--directory"):
-            # directory for out files
-            directory = arg
-        if opt in ("-n", "--numGenes"):
-            numGenes = int(arg)
-
-    speciesDict = sepGenes(inExt, numGenes)
-    writeSpecies(directory, speciesDict)
-#    pprint.pprint(speciesDict)
-
-if __name__ == "__main__":
-    main(sys.argv[1:])
+def main(sequences_directory, num_genes, out_directory):
+    species_dictionary = sepGenes(sequences_directory, num_genes)
+    writeSpecies(out_directory, species_dictionary)
