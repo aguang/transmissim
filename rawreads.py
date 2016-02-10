@@ -47,7 +47,7 @@ def sepGenes(iFile, numGenes):
 # writes all genes for each species with accompanying species ID into a reference.fa file along with
 # a BED file for RNAseqreadsimulator
 # then writes as a fastq CASAVA file
-def writeSpecies(directory, speciesDict, read_err, read_len, path, explv_flag='y'):
+def runRSRS(directory, speciesDict, read_err, read_len, path, explv_flag='y'):
     for speciesKey in speciesDict:
         # establish file paths
         outr = os.path.join(directory, speciesKey[1:])
@@ -118,4 +118,4 @@ def make_headers(read, paired_num, lane, tile):
 def main(gene_sequences, read_err, read_len, reads_out, num_genes, path, explv_flag):
 
     speciesDict = sepGenes(gene_sequences, num_genes)
-    writeSpecies(reads_out, speciesDict, read_err, read_len, path, explv_flag)
+    runRSRS(reads_out, speciesDict, read_err, read_len, path, explv_flag)
