@@ -1,12 +1,14 @@
 all	// simulate all, ST->GT, GT->GS, ST->GS or GS->RR
 	// input directory (leave blank if none)
 y	// save intermediate products? (y/n)
+20	// number of gene families
+===Species Tree Parameters===
+./test/trees // directory for species tree and gene trees
 ===Gene Sequence Parameters===
-/users/bguang/scratch/homology-testing/tests/newstep/genesequences	// directory for out files
+./test/genesequences	// directory for out files
 ===Raw Reads Parameters===
-/users/bguang/repos/homology-testing	// directory with RNAseqreadsimulator scripts
-/users/bguang/scratch/homology-testing/tests/newstep/reference		// directory for out files
-200		// number of genes
+./	// directory with RNAseqreadsimulator scripts
+test/reference		// directory for out files
 100		// read length
 0		// read error
 n		// use explv script? (y/n)
