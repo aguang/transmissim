@@ -30,8 +30,9 @@ if __name__ == "__main__":
         rsrs_path = options[9]
         reads_out = options[10]
         read_len = options[11]
-        read_err = options[12]
-        explv_flag = options[13]
+        num_reads = options[12]
+        read_err = options[13]
+        explv_flag = options[14]
 
         if analysis == "all" or "ST->GS":
             os.system("mkdir %s" % (tree_directory))
@@ -53,5 +54,5 @@ if __name__ == "__main__":
             os.system("mkdir %s" % (reads_out))
             if analysis == "GS->RR":
                 gene_sequences = input_directory
-            rawreads.main("%s/seqs/tree" % (gene_sequences), read_err, read_len, reads_out, num_genes, rsrs_path, explv_flag)
+            rawreads.main("%s/seqs/tree" % (gene_sequences), read_err, read_len, num_reads, reads_out, num_genes, rsrs_path, explv_flag)
             print "raw reads are in ", reads_out

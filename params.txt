@@ -1,7 +1,7 @@
 all	// simulate all, ST->GT, GT->GS, ST->GS or GS->RR
 	// input directory (leave blank if none)
 y	// save intermediate products? (y/n)
-20	// number of gene families
+5	// number of gene families
 ===Species Tree Parameters===
 ./test/trees // directory for species tree and gene trees
 ===Gene Sequence Parameters===
@@ -10,5 +10,6 @@ y	// save intermediate products? (y/n)
 ./	// directory with RNAseqreadsimulator scripts
 test/reference		// directory for out files
 100		// read length
+5000		// number of reads to simulate
 0		// read error
 n		// use explv script? (y/n)
