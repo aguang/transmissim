@@ -1,12 +1,5 @@
 #!/usr/bin/env python
-import os
-import sys, string
-import random as rand
-import math
-from ete2 import Tree
-from genesequence import simulate_sequences
-import rawreads    
-import agalma_format
+from rpy2.robjects.packages import importr
 
 if __name__ == "__main__":
 
@@ -22,37 +15,14 @@ if __name__ == "__main__":
         options = [line.strip().split('//')[0].strip() for line in open(params)]
         
         analysis = options[0]
-        input_directory = options[1]
-        intermediates = options[2]
-        num_genes = int(options[3])
-        tree_directory = options[5]
-        gene_sequences = options[7]
-        rsrs_path = options[9]
-        reads_out = options[10]
-        read_len = options[11]
-        num_reads = options[12]
-        read_err = options[13]
-        explv_flag = options[14]
 
-        if analysis == "all" or "ST->GS":
-            os.system("mkdir %s" % (tree_directory))
-            os.system("mkdir %s" % (gene_sequences))
-            os.system("mkdir %s/seqs/" % (gene_sequences))
+        if analysis == "all" or "TN->R":
 
-            os.system("simphy -RS 1 -RL F:%i -SB l:-14,1 -SL F:15 -SP F:1000000000 -SG F:1 -V 0 -OM 1 -O %s -OD 1 -OP 1 -OC 1 -ON 1 -CS 22" % (num_genes, tree_directory))
-            for i in range(1,num_genes+1):
-                j = str(i).zfill(int(math.log10(num_genes))+1)
-                gene_tree = Tree("%s/1/g_trees%s.trees" % (tree_directory, j))
-                simulate_sequences(gene_tree, "long_roots/root_seqs.txt%i" % (i), "%s/seqs/tree%s" % (gene_sequences, i))
+            outbreaker = importr('outbreaker')
 
-            if intermediates:
-                gs_in = "%s/seqs/tree" % (gene_sequences)
-                agalma_format.main(gs_in, num_genes, gene_sequences)
-                print "gene sequences are in ", gene_sequences
+            base = importr('base')
+            w = base.rep(0.8, 350)
+            test = outbreaker.simOutbreak(R0 = 2, infec_curve=w, n_hosts=200, duration=350)
+            print(test)
 
-        if analysis == "all" or "GS->RR":
-            os.system("mkdir %s" % (reads_out))
-            if analysis == "GS->RR":
-                gene_sequences = input_directory
-            rawreads.main("%s/seqs/tree" % (gene_sequences), read_err, read_len, num_reads, reads_out, num_genes, rsrs_path, explv_flag)
-            print "raw reads are in ", reads_out
+            print("done")
