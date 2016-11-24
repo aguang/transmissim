@@ -1,5 +1,6 @@
 import transmission as trans
 from rpy2.robjects import NA_Integer
+from itertools import repeat
 
 class TestBinary:
     def test_groupancestor(self):
@@ -11,5 +12,17 @@ class TestBinary:
     def test_pairinfected(self):
         source = {1:[1,3,4,7],5:[5,6]}
         pi = trans.pair_infected(source)
-        assert pi[0] == [(1, '1'), (2, '3'), (3, '4'), ('7', '0')]
-        assert pi[4] == [(1, '5'), ('6','4')]
+        assert pi[0] == [(1, '1'), (2, '3'), (3, '4'), ('0', '7')]
+        assert pi[4] == [(1, '5'), ('4','6')]
+
+    def test_assignbl(self):
+        pi = {0: [(1, '1'), (2, '3'), (3, '4'), ('0','7')], 4:[(1, '5'), ('4','6')]}
+        nmut = [NA_Integer, 13, NA_Integer, 120, 143, 14, 122, 272]
+        duration = 350
+        bl = trans.assign_bl(pi, nmut, duration)
+        assert bl[0] == [(337, 13), (230, 107), (207, 23), (78, 129)]
+        assert bl[4] == [(193, 14), (85, 108)]
+
+        duration = 500
+        bl = trans.assign_bl(pi, nmut, duration)
+        assert list(map(sum, bl[0])) == [500, 487, 380, 357]

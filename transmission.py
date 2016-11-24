@@ -2,7 +2,7 @@
 from rpy2.robjects.packages import importr
 from rpy2.robjects import NA_Integer
 from collections import defaultdict
-from itertools import izip as zip, count
+from itertools import izip as zip, count, repeat
 
 outbreaker = importr('outbreaker')
 base = importr('base')
@@ -12,9 +12,7 @@ test = outbreaker.simOutbreak(R0=2, infec_curve=w, n_hosts=200, duration=350)
 def binary_tree(ob):
 	ances = ob[4]
 	sources=group_ancestors(ances)
-    # branch length (will deal with later)
-    # all other nodes from sister branches to P0 in reverse order
-    # if the node infected others then it will have its own subtree as sister branch instead
+	pair_infected = pair_infected(sources)
 
 # group all nodes that share an ancestor
 def group_ancestors(ances):
@@ -33,14 +31,27 @@ def pair_infected(sources):
 		pairs=[]
 		for c in range(l):
 			pairs.append((c+1, str(infected[c]))) # c+1 rep index of pair, str represents node
-		pairs.append((str(infected[l]),str(group)))
+		pairs.append((str(group), str(infected[l])))
 		pair_infected[group] = pairs
 
 	# last node to be infected by ancestor forms pair with ancestor
 	return pair_infected
 
 # assign branch lengths
-def branch_lengths(pairs, onset):
-	return tree	
-
-binary_tree(test)
+def assign_bl(pair_infected, nmut, duration):
+	# maintained list of branch lengths at infect time
+	node_t = list(repeat(duration, len(nmut)))
+	bl = {}
+	for k,v in pair_infected.items():
+		t0 = node_t[k] # initial infection time for computing tips
+		t = t0 # initial infection time for internal bl
+		bl_pairs = []
+		for pair in v:
+			p1 = int(pair[1])
+			tips = t0 - nmut[p1]
+			internal = t - tips
+			t = tips # update t to tips for subsequent internals
+			node_t[p1] = tips
+			bl_pairs.append((tips, internal))
+		bl[k] = bl_pairs
+	return bl
