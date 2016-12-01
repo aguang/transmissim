@@ -26,3 +26,10 @@ class TestBinary:
         duration = 500
         bl = trans.assign_bl(pi, nmut, duration)
         assert list(map(sum, bl[0])) == [500, 487, 380, 357]
+
+    def test_fulltree(self):
+        bl = {0: [(337, 13), (230, 107), (207, 23), (78, 129)], 4: [(193, 14), (85, 108)]}
+        pi = {0: [(1, '1'), (2, '3'), (3, '4'), ('0','7')], 4:[(1, '5'), ('4','6')]}
+
+        t = trans.full_tree(pi, bl)
+        assert t == '((((0:78,7:78):129,((4:85,6:85):108,5:193):14):23,3:230):107,1:337):13'

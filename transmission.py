@@ -3,6 +3,7 @@ from rpy2.robjects.packages import importr
 from rpy2.robjects import NA_Integer
 from collections import defaultdict
 from itertools import izip as zip, count, repeat
+from re import sub
 
 outbreaker = importr('outbreaker')
 base = importr('base')
@@ -13,6 +14,9 @@ def binary_tree(ob):
 	ances = ob[4]
 	sources=group_ancestors(ances)
 	pair_infected = pair_infected(sources)
+	bl = assign_bl(pair_infected, ???) # have to check
+	full_tree = full_tree(pair_infected, bl)
+	# do we want Newick string or dendropy tree?
 
 # group all nodes that share an ancestor
 def group_ancestors(ances):
@@ -55,3 +59,20 @@ def assign_bl(pair_infected, nmut, duration):
 			bl_pairs.append((tips, internal))
 		bl[k] = bl_pairs
 	return bl
+
+# full tree
+def full_tree(pi, bl):
+	newick_str = '0:5'
+	for k in pi.keys():
+		k_str = '{p0}'
+		k_bl = 0
+		for pair, branches in zip(pi[k], bl[k]):
+			p1 = pair[1] # should be character
+			p_str = '({p0},' + p1 + ':' + str(branches[0]) + '):' + str(branches[1])
+			# then replace '_' in newick_str with p_str
+			k_str = k_str.format(p0 = p_str)
+			k_bl = branches[0]
+		k_str = k_str.format(p0 = str(k)+':'+str(k_bl))
+		newick_str = sub('%d:[0-9]*' % k, k_str, newick_str)
+		print(newick_str)
+	return newick_str
