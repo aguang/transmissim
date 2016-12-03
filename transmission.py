@@ -5,18 +5,12 @@ from collections import defaultdict
 from itertools import izip as zip, count, repeat
 from re import sub
 
-outbreaker = importr('outbreaker')
-base = importr('base')
-w = base.rep(0.8, 350)
-test = outbreaker.simOutbreak(R0=2, infec_curve=w, n_hosts=200, duration=350)
-
 def binary_tree(ob):
-	ances = ob[4]
+	ances = ob[4] # 4=ances, 7=nmut, 2=onset
 	sources=group_ancestors(ances)
-	pair_infected = pair_infected(sources)
-	bl = assign_bl(pair_infected, ???) # have to check
-	full_tree = full_tree(pair_infected, bl)
-	# do we want Newick string or dendropy tree?
+	pi = pair_infected(sources)
+	ft = full_tree(pi, ob[7])
+	return ft # do we want Newick string or dendropy tree?
 
 # group all nodes that share an ancestor
 def group_ancestors(ances):
@@ -61,18 +55,15 @@ def assign_bl(pair_infected, nmut, duration):
 	return bl
 
 # full tree
-def full_tree(pi, bl):
+def full_tree(pi, nmut):
 	newick_str = '0:5'
 	for k in pi.keys():
 		k_str = '{p0}'
-		k_bl = 0
-		for pair, branches in zip(pi[k], bl[k]):
+		for pair in pi[k]:
 			p1 = pair[1] # should be character
-			p_str = '({p0},' + p1 + ':' + str(branches[0]) + '):' + str(branches[1])
+			p_str = '({p0},' + p1 + ':1):' + str(nmut[int(p1)])
 			# then replace '_' in newick_str with p_str
 			k_str = k_str.format(p0 = p_str)
-			k_bl = branches[0]
-		k_str = k_str.format(p0 = str(k)+':'+str(k_bl))
+		k_str = k_str.format(p0 = str(k)+':1')
 		newick_str = sub('%d:[0-9]*' % k, k_str, newick_str)
-		print(newick_str)
 	return newick_str
