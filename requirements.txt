@@ -1,1 +1,1 @@
-pip install rpy2
+rpy2>=2.8
