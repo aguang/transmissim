@@ -77,4 +77,4 @@ if __name__ == "__main__":
                     for record in record_dict[k]:
                         SeqIO.write(record, f, "fasta")
                         f.write(">%s'\n" % record.id)
-                        f.write(str(record.seq.reverse_complement()))
+                        f.write(str(record.seq.reverse_complement())+"\n")
