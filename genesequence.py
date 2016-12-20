@@ -2,7 +2,7 @@
 import os
 import sys, string
 import random as rand
-from ete2 import Tree
+from ete3 import Tree
 
 # simulate sequences from specified tree
 def simulate_sequences(tree, root_file, out, indel_file=""):

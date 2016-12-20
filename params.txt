@@ -1,15 +1,14 @@
-all	// simulate all, ST->GT, GT->GS, ST->GS or GS->RR
-	// input directory (leave blank if none)
-y	// save intermediate products? (y/n)
-5	// number of gene families
-===Species Tree Parameters===
-./test/trees // directory for species tree and gene trees
-===Gene Sequence Parameters===
-./test/genesequences	// directory for out files
+all	// simulation options: all, TN->R
+2	// R0
+base.rep(0.8, 350)	// infec_curve function
+200	      // number of hosts
+350	      // duration of infection
+0	      // rate import case
+===Genome Parameters===
+hiv-db.fasta			// root sequence
 ===Raw Reads Parameters===
-./	// directory with RNAseqreadsimulator scripts
-test/reference		// directory for out files
-100		// read length
-5000		// number of reads to simulate
-0		// read error
-n		// use explv script? (y/n)
+./art_illumina	// path to ART_illumina
+tests/reference		// directory for out files
+MSv3	// sequencing system (-ss)
+250		// read length (-l)
+10		// coverage (-f)
