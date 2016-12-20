@@ -1,27 +1,29 @@
 #Overview
 
-This repository aims to host a set of Python scripts that will simulate transcriptomes with known orthology/paralogy relationships, gene tree topologies, and species tree topologies. It will incorporate a summary statistics script for assessing phylogenetics program performance at the homolog clustering level and at the final tree reconstruction level.
+transmissim is a pipeline that simulates transmission networks, transmission trees, viral genomes evolving along transmission trees, and high throughput sequencing reads. It uses outbreaker, pyvolve, and ART at the moment.
 
-#Testing
+#Usage
 
-To test, simply run:
+To run:
 
 	python simulate.py -p params.txt
 
+Different options for simulation parameters can be edited in params.txt.
+
 #Pipeline Organization
 
-##Species and Gene Tree Simulation
+##Transmission Network
 
-Species and gene tree simulation is done based off [SimPhy](https://github.com/adamallo/SimPhy).
+Transmission network simulation is done using [outbreaker](https://sites.google.com/site/therepiproject/r-pac/outbreaker).
+
+##Transmission Tree
+
+The transmission tree is currently a binary representation of the transmission network with a python script. We will incorporate coalescent events on the tree in the future.
 
 ##Sequence Simulation
 
-Sequence simulation for each gene tree is further done based off [indel-seq-gen](http://bioinfolab.unl.edu/~cstrope/iSG/) with root sequence input from assembled transcriptomes from the gastropod project.
+Sequence simulation along the transmission tree is done using [pyvolve](https://github.com/sjspielman/pyvolve).
 
 ##Read Simulation
 
-Read simulation for each gene sequence, sorted by taxa is done using [RNASeqReadSimulator](https://github.com/davidliwei/RNASeqReadSimulator).
-
-##Homology Assessment
-
-Homology clustering is performed using either fablast and mcl or blastp and mcl from the [agalma](https://bitbucket.org/caseywdunn/agalma) package. Homology assessment has yet to be determined.
+Read simulation for each sequence, sorted by taxa is done using [ART](http://www.niehs.nih.gov/research/resources/software/biostatistics/art/).
