@@ -52,10 +52,11 @@ if __name__ == "__main__":
                     success = 1
             
             full_tree = binary_tree(test)
+            with open('simulated_tree.tre', 'w') as f:
+                f.write(full_tree)
 
             # gene sequences
-            tree = pyvolve.read_tree(tree=full_tree)
-            pyvolve.print_tree(tree)
+            tree = pyvolve.read_tree(tree=full_tree, scale_tree = 0.0001)
             model = pyvolve.Model("nucleotide")
             root = ''
             with open(root_file, 'r') as f:
