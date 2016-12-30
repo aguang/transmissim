@@ -37,16 +37,16 @@ def pair_infected(sources):
 
 # full tree
 def full_tree(pi, nmut):
-	newick_str = ',0:1'
+	newick_str = ',0:100'
 	for k in pi.keys():
 		k_str = '{p0}'
 		for pair in pi[k]:
 			p1 = pair[1] # should be character
-			p_str = '({p0},' + p1 + ':1):' + str(nmut[int(p1)])
+			p_str = '({p0},' + p1 + ':100):' + str(nmut[int(p1)])
 			# then replace '_' in newick_str with p_str
 			k_str = k_str.format(p0 = p_str)
-		k_str = k_str.format(p0 = str(k)+':1')
-		newick_str = newick_str.replace(',%s:1' % k, ',%s' % k_str)
+		k_str = k_str.format(p0 = str(k)+':100')
+		newick_str = newick_str.replace(',%s:100' % k, ',%s' % k_str)
 	newick_str += ';'
 	newick_str = newick_str[1:]
 	return newick_str
