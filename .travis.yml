@@ -8,7 +8,17 @@ python:
   - "nightly" # currently points to 3.7-dev
 # command to install dependencies
 install:
-  - "pip install -r requirements.txt"
+  - sudo apt-get update
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda info -a
+  - conda create -q -n test-env python=$TRAVIS_PYTHON_VERSION pytest rpy2 ete3 pyvolve
+  - source activate test-env
+
 # command to run tests
 script: pytest
 addons:
