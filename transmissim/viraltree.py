@@ -1,0 +1,85 @@
+import os
+from numpy import random
+from ete3 import Tree
+
+# input: sampling time in specific tree, (tree parameters, seed)
+# output: individual tree
+# simulate viral tree for an individual
+def individual_viral_tree(sampling_time, birth_rate, death_rate, simphy, seed, out):
+	os.system("%s -st f:%s -sb f:%s -sd f:%s -cs %s -sp f:10000 -o %s -v 0" % (simphy, sampling_time, birth_rate, death_rate, seed, out))
+
+# input: source time in specific tree, source tree, (seed)
+# output: source branch index in specific tree
+# pick sequence for transmission
+def transmission_source_branch(transmission_time, source_tree, seed):
+	if transmission_time < 0:
+		raise ValueError("Transmission time cannot be < 0")
+	t = Tree(source_tree)
+	possibilities = []
+	for leaf in t.iter_leaves(is_leaf_fn=lambda n: n.get_distance(t) > transmission_time):
+		possibilities.append(leaf)
+	random.seed(seed)
+	i=random.randint(0, len(possibilities))
+	return possibilities[i], len(possibilities)
+
+# input: source tree indices, global transmission times
+# return transmission times specific to the source tree
+def local_transmission_time(onset, ancestors):
+	l = [0]
+	for t,a in zip(onset[1:], ancestors[1:]):
+		l.append(t-onset[a-1])
+	return l
+
+# joint together viral tree
+def joint_viral_tree(individual_trees, source_branches, ances, local_time, duration):
+	# number of individual trees = number of transmission sources
+	assert (len(individual_trees) == len(source_branches)), "Number of individual trees should equal number of source branches"
+
+	print("source_branches", source_branches)
+	for i in range(1, len(individual_trees)):
+		source = ances[i]-1 # ances contains the indices of the source tree
+		print(source)
+		S = individual_trees[source] 
+		print(S)
+		# find source node in source tree
+		B = source_branches[i]
+		# compute new distances for transmission node
+		new_node_dist = local_time[i] - (B.up).get_distance(S)
+		branch_dist = B.dist - new_node_dist
+		# add transmission node
+		T = B.up.add_child(name="T_%s_%s" % (source, i), dist=new_node_dist)
+		T.add_features(host=source)
+		# detach source node
+		B.detach()
+		# add source node as a child of transmission node
+		T.add_child(B)
+		B.dist = branch_dist
+		# add infected tree to transmission node
+		I = individual_trees[i]
+		T.add_child(I)
+		I.dist = 0.00001
+	vt = individual_trees[0]
+
+	return vt
+
+# run all functions together
+def viral(onset, ances, duration, birth_rate, death_rate, simphy, seed, out_dir):
+	# todo: make more efficient by collapsing redundant for loops
+	local_time = local_transmission_time(onset, ances)
+	sampling_times = map(lambda x: duration-x, onset)
+
+	individual_trees = []
+	c = 0
+	for i in sampling_times:
+		out = "%s/%s" % (out_dir, c)
+		individual_viral_tree(i, birth_rate, death_rate, simphy, seed, out)
+		individual_trees.append(Tree("%s/1/s_tree.trees") % (out))
+		c=c+1
+
+	source_branches = []
+	for i in range(len(local_transmission_time)):
+		time = local_time[i]
+		tree = individual_trees[ances[i]-1]
+		source_branches.append(transmission_source_branch(time, tree, seed)[0])
+	
+	vt = joint_viral_tree(individual_trees, source_branches, ances, local_time, duration)

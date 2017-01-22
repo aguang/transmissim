@@ -1,0 +1,16 @@
+all	// simulation start; options: all, TN, TT, GS
+	// simulation end; options: (blank), TT, GS, R
+2	// R0
+base.rep(0.8, 350)	// infec_curve function
+200	      // number of hosts
+350	      // duration of infection
+0	      // rate import case
+===Genome Parameters===
+
+hiv-db.fasta			// root sequence
+===Raw Reads Parameters===
+./art_illumina	// path to ART_illumina
+tests/reference		// directory for out files
+MSv3	// sequencing system (-ss)
+250		// read length (-l)
+100		// coverage (-f)
