@@ -1,4 +1,4 @@
-import transmission as trans
+from transmissim import transmission as trans
 from rpy2.robjects import NA_Integer
 from itertools import repeat
 

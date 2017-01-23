@@ -14,9 +14,8 @@ def individual_viral_tree(sampling_time, birth_rate, death_rate, simphy, seed, o
 def transmission_source_branch(transmission_time, source_tree, seed):
 	if transmission_time < 0:
 		raise ValueError("Transmission time cannot be < 0")
-	t = Tree(source_tree)
 	possibilities = []
-	for leaf in t.iter_leaves(is_leaf_fn=lambda n: n.get_distance(t) > transmission_time):
+	for leaf in source_tree.iter_leaves(is_leaf_fn=lambda n: n.get_distance(source_tree) > transmission_time):
 		possibilities.append(leaf)
 	random.seed(seed)
 	i=random.randint(0, len(possibilities))
@@ -73,13 +72,16 @@ def viral(onset, ances, duration, birth_rate, death_rate, simphy, seed, out_dir)
 	for i in sampling_times:
 		out = "%s/%s" % (out_dir, c)
 		individual_viral_tree(i, birth_rate, death_rate, simphy, seed, out)
-		individual_trees.append(Tree("%s/1/s_tree.trees") % (out))
+		print(out)
+#		t = open("%s/1/s_tree.trees" % (out)).read()
+		individual_trees.append(Tree("%s/1/s_tree.trees" % (out)))
 		c=c+1
 
 	source_branches = []
-	for i in range(len(local_transmission_time)):
+	for i in range(len(local_time)):
 		time = local_time[i]
 		tree = individual_trees[ances[i]-1]
 		source_branches.append(transmission_source_branch(time, tree, seed)[0])
 	
 	vt = joint_viral_tree(individual_trees, source_branches, ances, local_time, duration)
+	return vt

@@ -1,3 +1,9 @@
-if sys.version_info < (2, 7):
-    sys.stderr.write("ERROR: rpy2 requires at least Python Version 2.7 (with Python 3.5 or later recommended).\n")
-    sys.exit(1)
+from distutils.core import setup
+
+setup(
+    name='transmissim',
+    version='0.1dev',
+    packages=['transmissim',],
+    license='Creative Commons Attribution-Noncommercial-Share Alike license',
+    long_description=open('README.txt').read(),
+)

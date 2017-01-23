@@ -10,7 +10,7 @@ base.rep(0.8, 350)	// infec_curve function
 hiv-db.fasta			// root sequence
 ===Raw Reads Parameters===
 ./art_illumina	// path to ART_illumina
-tests/reference		// directory for out files
+../tests/reference		// directory for out files
 MSv3	// sequencing system (-ss)
 250		// read length (-l)
 100		// coverage (-f)
