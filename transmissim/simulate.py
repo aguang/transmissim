@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from rpy2.robjects.packages import importr
 from transmission import binary_tree
+from viraltree import viral
 from ete3 import Tree
 import pyvolve
 from itertools import groupby
@@ -10,7 +11,7 @@ from collections import defaultdict
 
 def sequence(full_tree, root_file):
     # gene sequences
-    tree = pyvolve.read_tree(tree=full_tree, scale_tree = 0.0001)
+    tree = pyvolve.read_tree(tree=full_tree, scale_tree = 0.001)
     model = pyvolve.Model("nucleotide")
     root = ''
     with open(root_file, 'r') as f:
@@ -19,7 +20,7 @@ def sequence(full_tree, root_file):
     my_evolver = pyvolve.Evolver(partitions = my_partition, tree=tree)
     my_evolver()
 
-def transmission(R0, w, n_hosts, duration, rate_import_case):
+def transmission(R0, w, n_hosts, duration, rate_import_case, out):
     outbreaker = importr('outbreaker')
     base = importr('base')
     w = base.rep(0.8, 350)
@@ -29,12 +30,17 @@ def transmission(R0, w, n_hosts, duration, rate_import_case):
         test = outbreaker.simOutbreak(R0 = R0, infec_curve=w, n_hosts=n_hosts, duration=duration, rate_import_case=rate_import_case)
         if len(test[4]) > 1:
             success = 1
-            
+    ances = test[4]
+    onset = test[2]
+
+    vt = viral(onset, ances, duration, 0.1, 0.1, "/Users/august/Research/tools/SimPhy_1.0.0/bin/simphy_mac64", 112233, out)
     full_tree = binary_tree(test)
     with open('simulated_tree.tre', 'w') as f:
         f.write(full_tree)
+    with open('simulated_viral.tre', 'w') as f:
+        f.write(vt.write(format=3))
 
-    return full_tree
+    return vt,full_tree
 
 def reads(art, sequencing_system, reads_out, read_length, coverage):
     # genomic reads
@@ -68,11 +74,14 @@ if __name__ == "__main__":
         analysis_start = options[0]
         analysis_end = options[1]
 
+        # transmission tree options
         R0 = int(options[2])
         w = options[3] # currently disabled
         n_hosts = int(options[4])
         duration = int(options[5])
         rate_import_case = int(options[6])
+
+        # viral tree options
 
         # pyvolve options
         full_tree = options[8]
@@ -86,9 +95,10 @@ if __name__ == "__main__":
         coverage = options[15]
 
         if analysis_start == "all" or "TN":
-            full_tree = transmission(R0, w, n_hosts, duration, rate_import_case)
+            vt,full_tree = transmission(R0, w, n_hosts, duration, rate_import_case, "./")
             if analysis_end != "TT":
-                sequence(full_tree, root_file)
+                t = vt.write(format=5)
+                sequence(t, root_file)
                 if analysis_end != "GS":
                     reads(art, sequencing_system,reads_out,read_length,coverage)
 

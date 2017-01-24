@@ -34,12 +34,9 @@ def joint_viral_tree(individual_trees, source_branches, ances, local_time, durat
 	# number of individual trees = number of transmission sources
 	assert (len(individual_trees) == len(source_branches)), "Number of individual trees should equal number of source branches"
 
-	print("source_branches", source_branches)
 	for i in range(1, len(individual_trees)):
 		source = ances[i]-1 # ances contains the indices of the source tree
-		print(source)
 		S = individual_trees[source] 
-		print(S)
 		# find source node in source tree
 		B = source_branches[i]
 		# compute new distances for transmission node
@@ -56,7 +53,7 @@ def joint_viral_tree(individual_trees, source_branches, ances, local_time, durat
 		# add infected tree to transmission node
 		I = individual_trees[i]
 		T.add_child(I)
-		I.dist = 0.00001
+		I.dist = 0
 	vt = individual_trees[0]
 
 	return vt
@@ -72,9 +69,12 @@ def viral(onset, ances, duration, birth_rate, death_rate, simphy, seed, out_dir)
 	for i in sampling_times:
 		out = "%s/%s" % (out_dir, c)
 		individual_viral_tree(i, birth_rate, death_rate, simphy, seed, out)
-		print(out)
+		# annotate individual tree with index
+		t = Tree("%s/1/s_tree.trees" % (out))
+		for leaf in t.iter_leaves():
+			leaf.name = "%s-%s" % (c, leaf.name)
 #		t = open("%s/1/s_tree.trees" % (out)).read()
-		individual_trees.append(Tree("%s/1/s_tree.trees" % (out)))
+		individual_trees.append(t)
 		c=c+1
 
 	source_branches = []
@@ -82,6 +82,7 @@ def viral(onset, ances, duration, birth_rate, death_rate, simphy, seed, out_dir)
 		time = local_time[i]
 		tree = individual_trees[ances[i]-1]
 		source_branches.append(transmission_source_branch(time, tree, seed)[0])
-	
+
 	vt = joint_viral_tree(individual_trees, source_branches, ances, local_time, duration)
+	vt.dist = 0
 	return vt
