@@ -2,7 +2,7 @@
 from rpy2.robjects.packages import importr
 from rpy2.robjects import NA_Integer
 from collections import defaultdict
-from itertools import izip as zip, count, repeat
+from itertools import count, repeat
 from re import sub
 
 def binary_tree(ob):

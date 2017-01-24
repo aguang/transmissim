@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import readline
 from rpy2.robjects.packages import importr
 from transmission import binary_tree
 from viraltree import viral
