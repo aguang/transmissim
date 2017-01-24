@@ -21,7 +21,7 @@ def sequence(full_tree, root_file):
     my_evolver = pyvolve.Evolver(partitions = my_partition, tree=tree)
     my_evolver()
 
-def transmission(R0, w, n_hosts, duration, rate_import_case, out):
+def transmission(R0, w, n_hosts, duration, rate_import_case, out, simphy_path, seed, birth_rate, death_rate):
     outbreaker = importr('outbreaker')
     base = importr('base')
     w = base.rep(0.8, 350)
@@ -34,7 +34,7 @@ def transmission(R0, w, n_hosts, duration, rate_import_case, out):
     ances = test[4]
     onset = test[2]
 
-    vt = viral(onset, ances, duration, 0.1, 0.1, "/Users/august/Research/tools/SimPhy_1.0.0/bin/simphy_mac64", 112233, out)
+    vt = viral(onset, ances, duration, birth_rate, death_rate, simphy_path, seed, out)
     full_tree = binary_tree(test)
     with open('simulated_tree.tre', 'w') as f:
         f.write(full_tree)
@@ -74,29 +74,35 @@ if __name__ == "__main__":
         
         analysis_start = options[0]
         analysis_end = options[1]
+        seed = int(options[2])
 
         # transmission tree options
-        R0 = int(options[2])
-        w = options[3] # currently disabled
-        n_hosts = int(options[4])
-        duration = int(options[5])
-        rate_import_case = int(options[6])
+        R0 = int(options[3])
+        w = options[4] # currently disabled
+        n_hosts = int(options[5])
+        duration = int(options[6])
+        rate_import_case = int(options[7])
 
         # viral tree options
+        simphy_path = options[9]
+        birth_rate = options[10]
+        print("birth rate: ", birth_rate)
+        death_rate = options[11]
+        print("death rate: ", death_rate)
 
         # pyvolve options
-        full_tree = options[8]
-        root_file = options[9]
+        full_tree = options[13]
+        root_file = options[14]
 
         # ART options
-        art = options[11]
-        reads_out = options[12]
-        sequencing_system = options[13]
-        read_length = options[14]
-        coverage = options[15]
+        art = options[16]
+        reads_out = options[17]
+        sequencing_system = options[18]
+        read_length = options[19]
+        coverage = options[20]
 
         if analysis_start == "all" or "TN":
-            vt,full_tree = transmission(R0, w, n_hosts, duration, rate_import_case, "./")
+            vt,full_tree = transmission(R0, w, n_hosts, duration, rate_import_case, "./", simphy_path, seed, birth_rate, death_rate)
             if analysis_end != "TT":
                 t = vt.write(format=5)
                 sequence(t, root_file)

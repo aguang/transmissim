@@ -1,10 +1,15 @@
 all	// simulation start; options: all, TN, TT, GS
 	// simulation end; options: (blank), TT, GS, R
+112233	// seed
 2	// R0
 base.rep(0.8, 350)	// infec_curve function
 200	      // number of hosts
 350	      // duration of infection
 0	      // rate import case
+===Viral Tree Parameters===
+./simphy_mac64	// simphy path
+0.1	// birth rate
+0.1	// death rate
 ===Genome Parameters===
 
 hiv-db.fasta			// root sequence
