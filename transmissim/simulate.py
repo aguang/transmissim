@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import readline
 from rpy2.robjects.packages import importr
+import rpy2.robjects as robjects
 from transmission import binary_tree
 from viraltree import viral
 from ete3 import Tree
@@ -9,10 +10,12 @@ from itertools import groupby
 import os
 from Bio import SeqIO
 from collections import defaultdict
+import random
 
 def sequence(full_tree, root_file):
     # gene sequences
     tree = pyvolve.read_tree(tree=full_tree, scale_tree = 0.001)
+    print("tree is ok...")
     model = pyvolve.Model("nucleotide")
     root = ''
     with open(root_file, 'r') as f:
@@ -25,6 +28,8 @@ def transmission(R0, w, n_hosts, duration, rate_import_case, out, simphy_path, s
     outbreaker = importr('outbreaker')
     base = importr('base')
     w = base.rep(0.8, 350)
+    rseed = robjects.r['set.seed']
+    rseed(seed)
     success = 0
     test = 0
     while success == 0: # make sure simulation yields a transmission network
@@ -39,7 +44,7 @@ def transmission(R0, w, n_hosts, duration, rate_import_case, out, simphy_path, s
     with open('simulated_tree.tre', 'w') as f:
         f.write(full_tree)
     with open('simulated_viral.tre', 'w') as f:
-        f.write(vt.write(format=3))
+        f.write(vt.write(format=5))
 
     return vt,full_tree
 
@@ -73,8 +78,10 @@ if __name__ == "__main__":
         options = [line.strip().split('//')[0].strip() for line in open(params)]
         
         analysis_start = options[0]
+        print(analysis_start)
         analysis_end = options[1]
         seed = int(options[2])
+        random.seed(seed)
 
         # transmission tree options
         R0 = int(options[3])
@@ -82,35 +89,40 @@ if __name__ == "__main__":
         n_hosts = int(options[5])
         duration = int(options[6])
         rate_import_case = int(options[7])
+        tree_out = options[8]
 
         # viral tree options
-        simphy_path = options[9]
-        birth_rate = options[10]
-        print("birth rate: ", birth_rate)
-        death_rate = options[11]
-        print("death rate: ", death_rate)
+        simphy_path = options[10]
+        birth_rate = options[11]
+        death_rate = options[12]
 
         # pyvolve options
-        full_tree = options[13]
-        root_file = options[14]
+        full_tree = options[14]
+        root_file = options[15]
 
         # ART options
-        art = options[16]
-        reads_out = options[17]
-        sequencing_system = options[18]
-        read_length = options[19]
-        coverage = options[20]
+        art = options[17]
+        reads_out = options[18]
+        sequencing_system = options[19]
+        read_length = options[20]
+        coverage = options[21]
 
-        if analysis_start == "all" or "TN":
-            vt,full_tree = transmission(R0, w, n_hosts, duration, rate_import_case, "./", simphy_path, seed, birth_rate, death_rate)
+        print(analysis_start == "all")
+        if analysis_start == "all":
+            vt,full_tree = transmission(R0, w, n_hosts, duration, rate_import_case, tree_out, simphy_path, seed, birth_rate, death_rate)
             if analysis_end != "TT":
                 t = vt.write(format=5)
                 sequence(t, root_file)
+                print("sequence finished")
                 if analysis_end != "GS":
                     reads(art, sequencing_system,reads_out,read_length,coverage)
 
         if analysis_start == "TT":
-            sequence(full_tree, root_file)
+            print("blah")
+            t=''
+            with open(full_tree, 'r') as f:
+                t=f.readline()
+            sequence(t, root_file)
             if analysis_end != "GS":
                 reads(art, sequencing_system, reads_out, read_length, coverage)
 

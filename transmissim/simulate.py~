@@ -73,8 +73,9 @@ if __name__ == "__main__":
         options = [line.strip().split('//')[0].strip() for line in open(params)]
         
         analysis_start = options[0]
+        print(analysis_start)
         analysis_end = options[1]
-        seed = options[2]
+        seed = int(options[2])
 
         # transmission tree options
         R0 = int(options[3])
@@ -86,20 +87,24 @@ if __name__ == "__main__":
         # viral tree options
         simphy_path = options[9]
         birth_rate = options[10]
+        print("birth rate: ", birth_rate)
         death_rate = options[11]
+        print("death rate: ", death_rate)
 
         # pyvolve options
         full_tree = options[13]
         root_file = options[14]
 
         # ART options
-        art = options[11]
-        reads_out = options[12]
-        sequencing_system = options[13]
-        read_length = options[14]
-        coverage = options[15]
+        art = options[16]
+        reads_out = options[17]
+        sequencing_system = options[18]
+        read_length = options[19]
+        coverage = options[20]
 
-        if analysis_start == "all" or "TN":
+        print(analysis_start == "all")
+        if analysis_start == "all":
+            print("hmm")
             vt,full_tree = transmission(R0, w, n_hosts, duration, rate_import_case, "./", simphy_path, seed, birth_rate, death_rate)
             if analysis_end != "TT":
                 t = vt.write(format=5)
@@ -108,7 +113,11 @@ if __name__ == "__main__":
                     reads(art, sequencing_system,reads_out,read_length,coverage)
 
         if analysis_start == "TT":
-            sequence(full_tree, root_file)
+            print("blah")
+            t=''
+            with open(full_tree, 'r') as f:
+                t=f.readline()
+            sequence(t, root_file)
             if analysis_end != "GS":
                 reads(art, sequencing_system, reads_out, read_length, coverage)
 
