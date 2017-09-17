@@ -3,6 +3,7 @@ import readline
 from rpy2.robjects.packages import importr
 from transmission import binary_tree
 from viraltree import viral
+import random
 from ete3 import Tree
 import pyvolve
 from itertools import groupby
@@ -24,7 +25,7 @@ def sequence(full_tree, root_file):
 def transmission(R0, w, n_hosts, duration, rate_import_case, out, simphy_path, seed, birth_rate, death_rate):
     outbreaker = importr('outbreaker')
     base = importr('base')
-    w = base.rep(0.8, 350)
+    w = base.rep(0.8, 1000)
     success = 0
     test = 0
     while success == 0: # make sure simulation yields a transmission network
@@ -74,7 +75,10 @@ if __name__ == "__main__":
         
         analysis_start = options[0]
         analysis_end = options[1]
-        seed = int(options[2])
+        seed = options[2]
+        if not seed:
+            seed = random.randint(1,4294967295)
+        else: seed = int(seed)
 
         # transmission tree options
         R0 = int(options[3])
@@ -86,9 +90,7 @@ if __name__ == "__main__":
         # viral tree options
         simphy_path = options[9]
         birth_rate = options[10]
-        print("birth rate: ", birth_rate)
         death_rate = options[11]
-        print("death rate: ", death_rate)
 
         # pyvolve options
         full_tree = options[13]

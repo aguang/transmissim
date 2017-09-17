@@ -6,6 +6,7 @@ from ete3 import Tree
 # output: individual tree
 # simulate viral tree for an individual
 def individual_viral_tree(sampling_time, birth_rate, death_rate, simphy, seed, out):
+	print("out: %s" % (out))
 	os.system("%s -st f:%s -sb f:%s -sd f:%s -cs %s -sp f:10000 -o %s -v 0" % (simphy, sampling_time, birth_rate, death_rate, seed, out))
 
 # input: source time in specific tree, source tree, (seed)
