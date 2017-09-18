@@ -1,13 +1,14 @@
 import os
 from numpy import random
 from ete3 import Tree
+import subprocess
 
 # input: sampling time in specific tree, (tree parameters, seed)
 # output: individual tree
 # simulate viral tree for an individual
 def individual_viral_tree(sampling_time, birth_rate, death_rate, simphy, seed, out):
-	print("out: %s" % (out))
-	os.system("%s -st f:%s -sb f:%s -sd f:%s -cs %s -sp f:10000 -o %s -v 0" % (simphy, sampling_time, birth_rate, death_rate, seed, out))
+#	subprocess.run([simphy, "-st f:%s" % sampling_time, "-sb f:%s" % birth_rate, "-sd f:%s" % death_rate, "-cs %s" % seed, "-sp f:10000", "-o %s" % out, "-v 0"], stdout=subprocess.DEVNULL)
+	os.system("%s -st f:%s -sb f:%s -sd f:%s -cs %s -sp f:10000 -o %s -v 0 " % (simphy, sampling_time, birth_rate, death_rate, seed, out))
 
 # input: source time in specific tree, source tree, (seed)
 # output: source branch index in specific tree
