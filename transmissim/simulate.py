@@ -86,9 +86,7 @@ if __name__ == "__main__":
         # viral tree options
         simphy_path = options[9]
         birth_rate = options[10]
-        print("birth rate: ", birth_rate)
         death_rate = options[11]
-        print("death rate: ", death_rate)
 
         # pyvolve options
         full_tree = options[13]
