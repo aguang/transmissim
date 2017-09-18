@@ -65,15 +65,15 @@ def joint_viral_tree(individual_trees, source_branches, ances, local_time, durat
 def viral(onset, ances, duration, birth_rate, death_rate, simphy, seed, out_dir):
 	# todo: make more efficient by collapsing redundant for loops
 	local_time = local_transmission_time(onset, ances)
-	sampling_times = map(lambda x: duration-x, onset)
+	sampling_times = list(map(lambda x: duration-x, onset))
 
 	individual_trees = []
 	c = 0
 	for i in sampling_times:
-		if i == 1.0:
+		if i == 1.0: # deal with -st error
 			i = 1.000001
 		out = "%s/%s" % (out_dir, c)
-		print(out)
+		#print(i)
 		individual_viral_tree(i, birth_rate, death_rate, simphy, seed, out)
 		# annotate individual tree with index
 		t = Tree("%s/1/s_tree.trees" % (out))
@@ -88,7 +88,7 @@ def viral(onset, ances, duration, birth_rate, death_rate, simphy, seed, out_dir)
 		time = local_time[i]
 		print("-----")
 		print("transmission time is: %s " % (time))
-		print("sampling time for tree is: %s " % (sampling_times[i]))
+		print("sampling time for tree is: %s " % sampling_times[i])
 		print("index for individual tree is: %s " % (ances[i]-1))
 		tree = individual_trees[ances[i]-1]
 		source_branches.append(transmission_source_branch(time, tree, seed)[0])

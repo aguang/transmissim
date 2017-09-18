@@ -88,7 +88,7 @@ if __name__ == "__main__":
         w = options[4] # currently disabled
         n_hosts = int(options[5])
         duration = int(options[6])
-        rate_import_case = int(options[7])
+        rate_import_case = float(options[7])
         tree_out = options[8]
 
         # viral tree options
