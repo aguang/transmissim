@@ -4,6 +4,7 @@ from rpy2.robjects.packages import importr
 import rpy2.robjects as robjects
 from transmission import binary_tree
 from viraltree import viral
+import random
 from ete3 import Tree
 import pyvolve
 from itertools import groupby
@@ -80,9 +81,10 @@ if __name__ == "__main__":
         analysis_start = options[0]
         print(analysis_start)
         analysis_end = options[1]
-        seed = int(options[2])
-        random.seed(seed)
-
+        seed = options[2]
+        if not seed:
+            seed = random.randint(1,4294967295)
+        else: seed = int(seed)
         # transmission tree options
         R0 = int(options[3])
         w = options[4] # currently disabled
@@ -92,9 +94,9 @@ if __name__ == "__main__":
         tree_out = options[8]
 
         # viral tree options
-        simphy_path = options[10]
-        birth_rate = options[11]
-        death_rate = options[12]
+        simphy_path = options[9]
+        birth_rate = options[10]
+        death_rate = options[11]
 
         # pyvolve options
         full_tree = options[14]

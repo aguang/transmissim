@@ -6,6 +6,7 @@ from ete3 import Tree
 # output: individual tree
 # simulate viral tree for an individual
 def individual_viral_tree(sampling_time, birth_rate, death_rate, simphy, seed, out):
+	print(sampling_time)
 	os.system("%s -st f:%s -sb f:%s -sd f:%s -cs %s -sp f:10000 -o %s -v 0" % (simphy, sampling_time, birth_rate, death_rate, seed, out))
 
 # input: source time in specific tree, source tree, (seed)
@@ -61,6 +62,7 @@ def joint_viral_tree(individual_trees, source_branches, ances, local_time, durat
 # run all functions together
 def viral(onset, ances, duration, birth_rate, death_rate, simphy, seed, out_dir):
 	# todo: make more efficient by collapsing redundant for loops
+	print("onset:", len(onset))
 	local_time = local_transmission_time(onset, ances)
 	sampling_times = map(lambda x: duration-x, onset)
 
