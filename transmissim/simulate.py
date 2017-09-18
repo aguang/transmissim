@@ -94,9 +94,9 @@ if __name__ == "__main__":
         tree_out = options[8]
 
         # viral tree options
-        simphy_path = options[9]
-        birth_rate = options[10]
-        death_rate = options[11]
+        simphy_path = options[10]
+        birth_rate = options[11]
+        death_rate = options[12]
 
         # pyvolve options
         full_tree = options[14]
