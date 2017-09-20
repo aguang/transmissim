@@ -6,12 +6,7 @@ python:
   - "3.6-dev" # 3.6 development branch
   - "nightly" # currently points to 3.7-dev
 # command to install dependencies
-
-before_install:
-  - add-apt-repository ppa:marutter/rrutter
-
 install:
-  - apt-get update
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
@@ -30,6 +25,7 @@ addons:
   apt:
     sources:
     - r-packages-precise
+    - ppa:marutter/rrutter
     packages:
     - r-base-core
     - r-recommended
