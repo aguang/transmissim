@@ -30,4 +30,4 @@ addons:
     - r-base-core
     - r-recommended
     - r-base
-    - libtiff4
+    - r-base-dev
