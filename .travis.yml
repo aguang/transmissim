@@ -28,4 +28,6 @@ addons:
     sources:
     - r-packages-precise
     packages:
+    - r-base-core
+    - r-recommended
     - r-base
