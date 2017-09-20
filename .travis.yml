@@ -6,13 +6,8 @@ python:
   - "3.6-dev" # 3.6 development branch
   - "nightly" # currently points to 3.7-dev
 # command to install dependencies
-before_install:
-  - sudo add-apt-repository ppa:marutter/rrutter
-  - sudo apt-get update
-  - sudo apt-get install r-base r-base-dev
 
 install:
-  - sudo apt-get update
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
