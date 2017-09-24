@@ -5,7 +5,7 @@ python:
   - "3.6"
 # command to install dependencies
 before_script:
-  - wget https://github.com/adamallo/SimPhy/releases/download/v1.0.2/SimPhy_1.0.2.tar.gz /tmp/simphy.tar.gz
+  - wget https://github.com/adamallo/SimPhy/releases/download/v1.0.2/SimPhy_1.0.2.tar.gz -O /tmp/simphy.tar.gz
   - tar -xvf /tmp/simphy.tar.gz
   - export PATH=$PATH:$PWD/Simphy_1.0.2/bin/
 
