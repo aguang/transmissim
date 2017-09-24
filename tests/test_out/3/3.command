@@ -1,0 +1,1 @@
+simphy_mac64 -st f:1.000001 -sb f:0.1 -sd f:0.1 -cs 998877 -sp f:10000 -o test_out/3 -v 0 

@@ -2,8 +2,8 @@
 import readline
 from rpy2.robjects.packages import importr
 import rpy2.robjects as robjects
-from transmission import binary_tree
-from viraltree import viral
+from transmissim.transmission import binary_tree
+from transmissim.viraltree import viral
 import random
 from ete3 import Tree
 import pyvolve
@@ -34,6 +34,7 @@ def transmission(R0, w, n_hosts, duration, rate_import_case, out, simphy_path, s
     success = 0
     test = 0
     while success == 0: # make sure simulation yields a transmission network
+        rseed(seed+1)
         test = outbreaker.simOutbreak(R0 = R0, infec_curve=w, n_hosts=n_hosts, duration=duration, rate_import_case=rate_import_case)
         if len(test[4]) > 1:
             success = 1
@@ -42,9 +43,9 @@ def transmission(R0, w, n_hosts, duration, rate_import_case, out, simphy_path, s
 
     vt = viral(onset, ances, duration, birth_rate, death_rate, simphy_path, seed, out)
     full_tree = binary_tree(test)
-    with open('simulated_tree.tre', 'w') as f:
+    with open('%s/simulated_tree.tre' % (out), 'w') as f:
         f.write(full_tree)
-    with open('simulated_viral.tre', 'w') as f:
+    with open('%s/simulated_viral.tre' % (out), 'w') as f:
         f.write(vt.write(format=5))
 
     return vt,full_tree
@@ -109,7 +110,7 @@ if __name__ == "__main__":
         read_length = options[20]
         coverage = options[21]
 
-        print(analysis_start == "all")
+        print(analysis_start == "Pipeline: all")
         if analysis_start == "all":
             vt,full_tree = transmission(R0, w, n_hosts, duration, rate_import_case, tree_out, simphy_path, seed, birth_rate, death_rate)
             if analysis_end != "TT":
@@ -120,7 +121,7 @@ if __name__ == "__main__":
                     reads(art, sequencing_system,reads_out,read_length,coverage)
 
         if analysis_start == "TT":
-            print("blah")
+            print("Pipeline: Transmission Tree -> Reads")
             t=''
             with open(full_tree, 'r') as f:
                 t=f.readline()
