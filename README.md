@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/aguang/transmissim.svg?branch=issue-1)](https://travis-ci.org/aguang/transmissim)
+[![Build Status](https://travis-ci.org/aguang/transmissim.svg?branch=master)](https://travis-ci.org/aguang/transmissim)
 
 # Overview
 
