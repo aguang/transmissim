@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/aguang/transmissim.svg?branch=issue-1)](https://travis-ci.org/aguang/transmissim)
+
 # Overview
 
 transmissim is a pipeline that simulates transmission networks, transmission trees, viral genomes evolving along transmission trees, and high throughput sequencing reads. It uses outbreaker, pyvolve, and ART at the moment.
