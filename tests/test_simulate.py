@@ -1,10 +1,16 @@
 from __future__ import print_function
 from transmissim import simulate as sim
 from rpy2.robjects import NA_Integer
+from rpy2.robjects.packages import importr
 import os
 import pytest
 
 def test_transmission_is_reproducible(tmpdir):
+    # install outbreaker
+    utils = importr('utils')
+    utils.chooseCRANmirror(ind=1)
+    utils.install_packages('outbreaker')
+
 	# make sure transmission in simulate is reproducible
     R0 = 2
     w = "blah"        
