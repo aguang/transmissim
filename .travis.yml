@@ -36,7 +36,5 @@ addons:
     - r-packages-precise
     - sourceline: 'ppa:marutter/rrutter'
     packages:
-    - r-base-core
-    - r-recommended
     - r-base
     - r-base-dev
