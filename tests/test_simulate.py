@@ -6,10 +6,6 @@ import os
 import pytest
 
 def test_transmission_is_reproducible(tmpdir):
-    # install outbreaker
-    utils = importr('utils')
-    utils.chooseCRANmirror(ind=1)
-    utils.install_packages('outbreaker')
 
 	# make sure transmission in simulate is reproducible
     R0 = 2
@@ -17,7 +13,7 @@ def test_transmission_is_reproducible(tmpdir):
     n_hosts = 100
     duration = 100
     rate_import_case = 0
-    simphy_path = "simphy"
+    simphy_path = "simphy_mac64"
     seed = 998877
     birth_rate = 0.1
     death_rate = 0.1
@@ -27,13 +23,15 @@ def test_transmission_is_reproducible(tmpdir):
     assert(len(tmpdir.listdir())) == 6
 
     p = tmpdir.join("simulated_tree.tre")
+    sim_tree = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'test_out/simulated_tree.tre')
     tt_out = ""
-    with open("test_out/simulated_tree.tre") as f:
+    with open(sim_tree) as f:
         tt_out = f.read()
     assert p.read() == tt_out
 
     q = tmpdir.join("simulated_viral.tre")
     vt_out = ""
-    with open("test_out/simulated_viral.tre") as f:
+    sim_viral = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'test_out/simulated_viral.tre')
+    with open(sim_viral) as f:
         vt_out = f.read()
     assert q.read() == vt_out

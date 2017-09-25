@@ -2,6 +2,7 @@ from ete3 import Tree
 from rpy2.robjects import NA_Integer
 from transmissim import viraltree
 import pytest
+import os
 
 class TestSource:
 	def test_one(self):
@@ -90,9 +91,9 @@ class TestViral:
 		duration = 350
 		birth_rate = 0.1
 		death_rate = 0.1
-		simphy = "/Users/august/Research/tools/SimPhy_1.0.0/bin/simphy_mac64"
+		simphy = "simphy_mac64"
 		seed = 112233
-		out_dir = "/Users/august/Research/transmissim/tests/test_viral"
+		out_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "test_viral")
 		vt = viraltree.viral(onset, ances, duration, birth_rate, death_rate, simphy, seed, out_dir)
 		print(vt)
 		assert 1
