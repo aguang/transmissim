@@ -95,6 +95,6 @@ class TestViral:
 		seed = 112233
 		out_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "test_viral")
 		print(out_dir)
-		vt = viraltree.viral(onset, ances, duration, birth_rate, death_rate, simphy, seed, out_dir)
-		print(vt)
+		#vt = viraltree.viral(onset, ances, duration, birth_rate, death_rate, simphy, seed, out_dir)
+		#print(vt)
 		assert 1
