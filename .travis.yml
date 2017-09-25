@@ -24,7 +24,6 @@ install:
   - conda install r-base=3.3.2
   - conda install -c r r-igraph
   - conda install -c r r-ape
-  - conda install -c r r-dplyr
   - conda install -c geraldmc r-adegenet
   - pip install ete3
   - pip install pyvolve
