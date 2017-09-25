@@ -21,11 +21,10 @@ install:
   - conda info -a
   - conda create -q -n test-env python=$TRAVIS_PYTHON_VERSION pytest rpy2
   - source activate test-env
-  - conda install -c biobuilds r-base
+  - conda install r-base=3.3.2
   - conda install -c r r-igraph
   - conda install -c r r-ape
   - conda install -c r r-dplyr
-  - conda install -c bioconda r-ade4
   - conda install -c geraldmc r-adegenet
   - pip install ete3
   - pip install pyvolve
@@ -38,5 +37,4 @@ addons:
     - r-packages-precise
     - sourceline: 'ppa:marutter/rrutter'
     packages:
-    - r-base
     - r-base-dev
