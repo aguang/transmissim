@@ -3,6 +3,7 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+osx_image: xcode8
 # command to install dependencies
 before_script:
   - wget https://github.com/adamallo/SimPhy/releases/download/v1.0.2/SimPhy_1.0.2.tar.gz -O /tmp/simphy.tar.gz
@@ -36,6 +37,9 @@ addons:
     - r-packages-precise
     - sourceline: 'ppa:marutter/rrutter'
     packages:
-    - gcc
+    - gcc-7
     - r-base
     - r-base-dev
+
+after_failure:
+    - cat config.log
