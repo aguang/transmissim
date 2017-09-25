@@ -11,6 +11,7 @@ before_script:
   - tar -xvf /tmp/simphy.tar.gz
   - export PATH=$PATH:$PWD/Simphy_1.0.2/bin/
   - wget https://cran.r-project.org/src/contrib/outbreaker_1.1-8.tar.gz -O /tmp/outbreaker.tar.gz
+  - cat config.log
   - R CMD INSTALL --configure-args='CFLAGS="-I/usr/local/opt/gsl/include" LDFLAGS="-L/usr/local/opt/gsl/lib -lgsl -lgslcblas"' /tmp/outbreaker.tar.gz
 
 install:
