@@ -4,6 +4,8 @@ from rpy2.robjects.packages import importr
 import rpy2.robjects as robjects
 from transmissim.transmission import binary_tree
 from transmissim.viraltree import viral
+#from transmission import binary_tree
+#from viraltree import viral
 import random
 from ete3 import Tree
 import pyvolve

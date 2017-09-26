@@ -15,10 +15,14 @@ def binary_tree(ob):
 # group all nodes that share an ancestor
 def group_ancestors(ances):
 	sources = defaultdict(list)
+	NA_set = set([])
 	for i,s in zip(count(), ances):
 		if s is not NA_Integer:
 			sources[s].append(i)
-	return sources
+		else:
+			NA_set.add(i)
+
+	return sources, NA_set
 
 # for each group, construct pair tree
 def pair_infected(sources):
@@ -31,22 +35,38 @@ def pair_infected(sources):
 			pairs.append((c+1, str(infected[c]))) # c+1 rep index of pair, str represents node
 		pairs.append((str(group), str(infected[l])))
 		pair_infected[group] = pairs
-
 	# last node to be infected by ancestor forms pair with ancestor
+
 	return pair_infected
 
 # full tree
-def full_tree(pi, nmut):
-	newick_str = ',0:1'
-	for k in pi.keys():
+def full_tree(pi, nmut, NA_set):
+	trees = []
+	nodes_in_trees = defaultdict(int)
+	i = 0
+	for cluster_origin in NA_set:
+		trees.append(',{p0}:1'.format(p0=cluster_origin))
+		nodes_in_trees[cluster_origin] = i
+		i = i+1
+
+
+	for infection_source in pi.keys():
+		newick_str = trees[nodes_in_trees[infection_source]]
 		k_str = '{p0}'
-		for pair in pi[k]:
+		for pair in pi[infection_source]:
 			p1 = pair[1] # should be character
+			nodes_in_trees[int(p1)] = nodes_in_trees[infection_source]
+			print(nodes_in_trees)
 			p_str = '({p0},' + p1 + ':1):' + str(nmut[int(p1)])
 			# then replace '_' in newick_str with p_str
 			k_str = k_str.format(p0 = p_str)
-		k_str = k_str.format(p0 = str(k)+':1')
-		newick_str = newick_str.replace(',%s:1' % k, ',%s' % k_str)
-	newick_str += ';'
-	newick_str = newick_str[1:]
-	return newick_str
+		k_str = k_str.format(p0 = str(infection_source)+':1')
+		newick_str = newick_str.replace(',%s:1' % infection_source, ',%s' % k_str)
+		trees[nodes_in_trees[infection_source]] = newick_str
+
+	for i in range(len(trees)):
+		print(trees[i])
+		trees[i] += ';'
+		trees[i] = trees[i][1:]
+
+	return trees
