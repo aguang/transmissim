@@ -1,21 +1,46 @@
 import os
 from numpy import random
 from ete3 import Tree
+import dendropy
+from dendropy.simulate import treesim
 import subprocess
 
+# modified from dendropy
+def generate_discrete_R0_tree(birth_rates, death_rates, time_intervals, sampling_time):
+	tree = treesim.birth_death_tree(birth_rates[0],
+		death_rates[0],
+		max_time=time_intervals[0],
+		repeat_until_success=True)
+#	print(tree.as_string(schema='newick'))
+#	for i in range(1,last_index):
+#		tree = treesim.birth_death_tree(birth_rates[i],
+#				death_rates[i],
+#				max_time=time_intervals[i],
+#				tree = tree,
+#				repeat_until_success=True)
+#		print(tree.as_string(schema='newick'))
+	return tree
+
 # input: sampling time in specific tree, (tree parameters, seed)
-# output: individual tree
+# output: individual's viral phylogeny
 # simulate viral tree for an individual
-def individual_viral_tree(sampling_time, birth_rate, death_rate, simphy, seed, out):
+def individual_viral_tree(sampling_time, birth_rates, death_rates, time_intervals, seed):
+	assert len(birth_rates) == len(time_intervals)
+	assert len(birth_rates) == len(death_rates)
+	last_index = next(x[0] for x in enumerate(time_intervals) if x[1] > sampling_time)
+	times = time_intervals
+	times[last_index] = sampling_time
+	viral_tree = generate_discrete_R0_tree(birth_rates, death_rates, times, sampling_time)
+	return(viral_tree)
 #	subprocess.run([simphy, "-st f:%s" % sampling_time, "-sb f:%s" % birth_rate, "-sd f:%s" % death_rate, "-cs %s" % seed, "-sp f:10000", "-o %s" % out, "-v 0"], stdout=subprocess.DEVNULL)
-	os.system("%s -st f:%s -sb f:%s -sd f:%s -cs %s -sp f:10000 -o %s -v 0 " % (simphy, sampling_time, birth_rate, death_rate, seed, out))
+#	os.system("%s -st f:%s -sb f:%s -sd f:%s -cs %s -sp f:10000 -o %s -v 0 " % (simphy, sampling_time, birth_rate, death_rate, seed, out))
 
 # input: source time in specific tree, source tree, (seed)
 # output: source branch index in specific tree
 # pick sequence for transmission
 def transmission_source_branch(transmission_time, source_tree, seed):
 	height = source_tree.get_distance(source_tree.get_leaves()[0])
-	print("height of tree is %s: " % (height))
+	#print("height of tree is %s: " % (height))
 	if transmission_time < 0:
 		raise ValueError("Transmission time cannot be < 0")
 	possibilities = []
@@ -28,6 +53,7 @@ def transmission_source_branch(transmission_time, source_tree, seed):
 
 # input: source tree indices, global transmission times
 # return transmission times specific to the source tree
+# note: this is for outbreaker, when branch lengths would be in # of mutations as well...
 def local_transmission_time(onset, ancestors):
 	l = [0]
 	for t,a in zip(onset[1:], ancestors[1:]):
@@ -63,27 +89,24 @@ def joint_viral_tree(individual_trees, source_branches, ances, local_time, durat
 
 	return vt
 
-# run all functions together
-def viral(onset, ances, duration, birth_rate, death_rate, simphy, seed, out_dir):
-	# todo: make more efficient by collapsing redundant for loops
-	local_time = local_transmission_time(onset, ances)
-	sampling_times = list(map(lambda x: duration-x, onset))
-
+def make_list_of_individual_viral_trees(sampling_times, birth_rates, death_rates, time_intervals, seed, out_dir):
 	individual_trees = []
 	c = 0
 	for i in sampling_times:
-		if i == 1.0: # deal with -st error
-			i = 1.000001
-		out = "%s/%s" % (out_dir, c)
-		#print(i)
-		individual_viral_tree(i, birth_rate, death_rate, simphy, seed, out)
-		# annotate individual tree with index
-		t = Tree("%s/1/s_tree.trees" % (out))
-		for leaf in t.iter_leaves():
-			leaf.name = "%s-%s" % (c, leaf.name)
-#		t = open("%s/1/s_tree.trees" % (out)).read()
-		individual_trees.append(t)
+		viral_tree = individual_viral_tree(i, birth_rates, death_rates, time_intervals, seed)
+		for leaf in viral_tree.leaf_node_iter():
+			leaf.taxon = "%s-%s" % (c, leaf.taxon)
+		individual_trees.append(viral_tree)
 		c=c+1
+	return(individual_trees)
+
+# run all functions together
+def viral(onset, duration, ances, birth_rates, death_rates, seed, out_dir):
+	# todo: make more efficient by collapsing redundant for loops
+	transmission_times = local_transmission_time(onset, ances)
+	sampling_times = list(map(lambda x: duration-x, onset))
+
+	individual_trees = make_list_of_individual_viral_trees(sampling_times, birth_rates, death_rates, simphy, seed, out_dir)
 
 	source_branches = []
 	for i in range(len(local_time)):

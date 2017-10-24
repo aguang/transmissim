@@ -1,6 +1,8 @@
 from transmissim import transmission as trans
 from rpy2.robjects import NA_Integer
 from itertools import repeat
+import dendropy
+from dendropy.calculate import treecompare
 
 class TestGroupAncestor:
 
@@ -68,7 +70,7 @@ class TestFullTree:
         pi = {0: [(1, '1'), (2, '3'), (3, '4'), ('0','7')], 4:[(1, '5'), ('4','6')]}
         nmut = [NA_Integer, 13, NA_Integer, 120, 143, 14, 122, 272]
         NA_set = {0}
-        t = trans.full_tree(pi, nmut, NA_set)
+        t = trans.full_trees(pi, nmut, NA_set)
         assert t == ['((((0:1,7:1):272,((4:1,6:1):122,5:1):14):143,3:1):120,1:1):13;']
 
     def test_multiple_ft1(self):
@@ -76,10 +78,36 @@ class TestFullTree:
         sources, NA_set = trans.group_ancestors(ances)
         pi = trans.pair_infected(sources)
         nmut = [NA_Integer, 7, NA_Integer, NA_Integer, 48, 1, NA_Integer, 11, NA_Integer, NA_Integer, NA_Integer, NA_Integer, NA_Integer, 54, NA_Integer, NA_Integer]
-        t = trans.full_tree(pi, nmut, NA_set)
+        t = trans.full_trees(pi, nmut, NA_set)
         assert len(t) == 11
         assert(t[0]) == '(0:1,1:1):7;'
         assert(t[1]) == '(2:1,(4:1,(5:1,7:1):11):1):48;'
         assert(t[2]) == '3:1;'
         assert(t[3]) == '6:1;'
+
+class TestMergeTree:
+    def test_merge(self):
+        full_trees = ['(0:1,1:1):7;', '(2:1,(4:1,(5:1,7:1):11):1):48;']
+        ancestral_R0 = 6.9304
+        ancestral_death = 0.00014
+        ancestral_time = 3650
+        tree = trans.merge_trees(full_trees, ancestral_R0, ancestral_death, ancestral_time, 112233)
+        assert(len(tree.leaf_nodes()) == 6)
+
+    def test_reproducible(self):
+        full_trees = ['(0:1,1:1):7;', '(2:1,(4:1,(5:1,7:1):11):1):48;', '3:1;']
+        ancestral_R0 = 6.9304
+        ancestral_death = 0.00014
+        ancestral_time = 3650
+
+        tree = trans.merge_trees(full_trees, ancestral_R0, ancestral_death, ancestral_time, 56789)
+        print(tree.as_string('newick'))
+        assert(len(tree.leaf_nodes()) == 7)
+        tree2 = trans.merge_trees(full_trees, ancestral_R0, ancestral_death, ancestral_time, 56789)
+        print(tree2.as_string('newick'))
+        assert(len(tree2.leaf_nodes()) == 7)
+        assert(tree.as_string('newick')==tree2.as_string('newick'))
         
+        tree_incomplete = trans.merge_trees(full_trees, ancestral_R0, ancestral_death, ancestral_time, 112234)
+        print(tree_incomplete.as_string('newick'))
+        assert(len(tree.leaf_nodes()) <= 7)

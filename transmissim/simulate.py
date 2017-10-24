@@ -2,9 +2,9 @@
 import readline
 from rpy2.robjects.packages import importr
 import rpy2.robjects as robjects
-from transmissim.transmission import binary_tree
+from transmissim.transmission import binary_trees
 from transmissim.viraltree import viral
-#from transmission import binary_tree
+#from transmission import binary_trees
 #from viraltree import viral
 import random
 from ete3 import Tree
@@ -43,14 +43,16 @@ def transmission(R0, w, n_hosts, duration, rate_import_case, out, simphy_path, s
     ances = test[4]
     onset = test[2]
 
-    vt = viral(onset, ances, duration, birth_rate, death_rate, simphy_path, seed, out)
-    full_tree = binary_tree(test)
-    with open('%s/simulated_tree.tre' % (out), 'w') as f:
-        f.write(full_tree)
+    vt = viral(onset, ances, duration, birth_rate, death_rate, seed, out)
+    full_trees = binary_trees(test)
+    i = 0
+    for tree in full_trees:
+        with open('%s/simulated_tree_%s.tre' % (out, i), 'w') as f:
+           f.write(tree)
     with open('%s/simulated_viral.tre' % (out), 'w') as f:
         f.write(vt.write(format=5))
 
-    return vt,full_tree
+    return vt,full_trees
 
 def reads(art, sequencing_system, reads_out, read_length, coverage):
     # genomic reads

@@ -4,12 +4,15 @@ from rpy2.robjects import NA_Integer
 from collections import defaultdict
 from itertools import count, repeat
 from re import sub
+from dendropy.simulate import treesim
+import dendropy
+import random
 
-def binary_tree(ob):
+def binary_trees(ob):
 	ances = ob[4] # 4=ances, 7=nmut, 2=onset
 	sources=group_ancestors(ances)
 	pi = pair_infected(sources)
-	ft = full_tree(pi, ob[7])
+	ft = full_trees(pi, ob[2])
 	return ft # do we want Newick string or dendropy tree?
 
 # group all nodes that share an ancestor
@@ -39,8 +42,8 @@ def pair_infected(sources):
 
 	return pair_infected
 
-# full tree
-def full_tree(pi, nmut, NA_set):
+# full trees
+def full_trees(pi, onset, NA_set):
 	trees = []
 	nodes_in_trees = defaultdict(int)
 	i = 0
@@ -49,7 +52,6 @@ def full_tree(pi, nmut, NA_set):
 		nodes_in_trees[cluster_origin] = i
 		i = i+1
 
-
 	for infection_source in pi.keys():
 		newick_str = trees[nodes_in_trees[infection_source]]
 		k_str = '{p0}'
@@ -57,7 +59,7 @@ def full_tree(pi, nmut, NA_set):
 			p1 = pair[1] # should be character
 			nodes_in_trees[int(p1)] = nodes_in_trees[infection_source]
 			print(nodes_in_trees)
-			p_str = '({p0},' + p1 + ':1):' + str(nmut[int(p1)])
+			p_str = '({p0},' + p1 + ':1):' + str(onset[int(p1)])
 			# then replace '_' in newick_str with p_str
 			k_str = k_str.format(p0 = p_str)
 		k_str = k_str.format(p0 = str(infection_source)+':1')
@@ -70,3 +72,17 @@ def full_tree(pi, nmut, NA_set):
 		trees[i] = trees[i][1:]
 
 	return trees
+
+# merge transmission trees together with longer timeline
+def merge_trees(full_trees, ancestral_R0, ancestral_death, ancestral_time, seed):
+	random.seed(seed)
+	birth_rate = ancestral_R0 * ancestral_death
+	ntax = len(full_trees)
+	tree = treesim.birth_death_tree(birth_rate=birth_rate, death_rate=ancestral_death,max_time=ancestral_time,ntax=ntax,rng=random)	
+
+	i = 0
+	for leaf in tree.leaf_nodes():
+		t = dendropy.Tree.get(data=full_trees[i],schema='newick')
+		leaf.add_child(t.seed_node)
+		i = i+1
+	return(tree)

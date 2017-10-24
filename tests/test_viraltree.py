@@ -58,6 +58,11 @@ class TestLocalTransmission:
 		ances = [NA_Integer, 1, 2, 1, 2]
 		transmission_times = viraltree.local_transmission_time(onset, ances)
 		assert transmission_times == [0, 10, 10, 30, 30]
+	def test_multiple(self):
+		onset = [0, 5, 12, 37, 39]
+		ances = [NA_Integer, 1, NA_Integer, NA_Integer, 3]
+		transmission_times = viraltree.local_transmission_time(onset, ances)
+		assert transmission_times == [0, 5, 12, 37, 27]
 
 class TestJoint:
 	def test_simple(self):
@@ -82,7 +87,39 @@ class TestJoint:
 		assert vt.get_common_ancestor("2-1", "2-2", "2-3").dist == t.get_common_ancestor("2-1", "2-2", "2-3").dist
 		assert vt.get_common_ancestor("1-2", "2-1").dist == t.get_common_ancestor("1-2", "2-1").dist
 
+#	def test_multiple_clusters(self):
+#		t_a = Tree("(1-1:100,(1-2:75,(1-3:25,1-4:25):50):25);")
+#		s = t_a.get_common_ancestor("1-2", "1-3", "1-4")
+#		t_b = Tree("((2-1:25, 2-2:25):25, 2-3:50);")
+#		t_c = Tree("((3-1:15, 3-2:15):10, 3-3:25);")
+#		vt = viraltree.joint_viral_tree([t_a, t_b, t_c], [NA_Integer, s, NA_Integer], [NA_Integer, 1, NA_Integer], [0, 25, 75], 100)
+#		t = Tree("(1-1:100,(((2-1:25, 2-2:25):50, 2-3:75):0.0, ((((3-1:15, 3-2:15):10, 3-3:25):0.0, 1-2:25):50, (1-3:25, 1-4:25):50):0.0):25);")
+
 	# Todo: write test with a->b->c and internal node infections
+
+def test_multiple(tmpdir):
+	onset = [0, 5, 12, 37, 39]
+	ances = [NA_Integer, 1, NA_Integer, NA_Integer, 3]
+	duration = 100
+	seed = 998878
+	sampling_times = list(map(lambda x: duration-x, onset))
+	assert sampling_times[0] == 100
+	assert sampling_times[1] == 95
+	assert sampling_times[2] == 88
+	assert sampling_times[3] == 63
+	assert sampling_times[4] == 61
+#	birth_rates = [0.5,4,0.5]
+#	death_rates = [0.5,0.5,0.5]
+#	time_intervals = [5,25,float('inf')]
+	birth_rates = [0.5]
+	death_rates = [0.5]
+	time_intervals = [float('inf')]
+#	print(tmpdir)
+	viral_trees = viraltree.make_list_of_individual_viral_trees(sampling_times, birth_rates, death_rates, time_intervals, seed, tmpdir)
+	assert len(viral_trees) == 5
+
+	vt = viraltree.viral(onset, ances, duration, birth_rates, death_rates, seed, tmpdir)
+
 
 class TestViral:
 	def test_simple(self):
@@ -91,10 +128,9 @@ class TestViral:
 		duration = 350
 		birth_rate = 0.1
 		death_rate = 0.1
-		simphy = "simphy"
 		seed = 112233
 		out_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), "test_viral")
 		print(out_dir)
-		#vt = viraltree.viral(onset, ances, duration, birth_rate, death_rate, simphy, seed, out_dir)
-		#print(vt)
+		vt = viraltree.viral(onset, ances, duration, birth_rate, death_rate, seed, out_dir)
+		print(vt)
 		assert 1
