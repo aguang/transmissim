@@ -35,7 +35,7 @@ install:
 
 # command to run tests
 script:
-  - python -m pytest
+  - py.test --cov=./
 
 addons:
   apt:
