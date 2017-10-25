@@ -6,7 +6,11 @@ from dendropy.simulate import treesim
 import subprocess
 
 # modified from dendropy
-def generate_discrete_R0_tree(birth_rates, death_rates, time_intervals, sampling_time):
+# potential bug in dendropy for trees with different rates @ different times
+def generate_discrete_R0_tree(birth_rates, death_rates, time_intervals):
+	assert(all(x >= 0 for x in birth_rates))
+	assert(all(x >= 0 for x in death_rates))
+	assert(all(x >= 0 for x in time_intervals))
 	tree = treesim.birth_death_tree(birth_rates[0],
 		death_rates[0],
 		max_time=time_intervals[0],
@@ -30,7 +34,8 @@ def individual_viral_tree(sampling_time, birth_rates, death_rates, time_interval
 	last_index = next(x[0] for x in enumerate(time_intervals) if x[1] > sampling_time)
 	times = time_intervals
 	times[last_index] = sampling_time
-	viral_tree = generate_discrete_R0_tree(birth_rates, death_rates, times, sampling_time)
+	times[last_index+1:] = 0
+	viral_tree = generate_discrete_R0_tree(birth_rates, death_rates, times)
 	return(viral_tree)
 #	subprocess.run([simphy, "-st f:%s" % sampling_time, "-sb f:%s" % birth_rate, "-sd f:%s" % death_rate, "-cs %s" % seed, "-sp f:10000", "-o %s" % out, "-v 0"], stdout=subprocess.DEVNULL)
 #	os.system("%s -st f:%s -sb f:%s -sd f:%s -cs %s -sp f:10000 -o %s -v 0 " % (simphy, sampling_time, birth_rate, death_rate, seed, out))

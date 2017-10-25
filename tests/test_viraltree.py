@@ -4,6 +4,20 @@ from transmissim import viraltree
 import pytest
 import os
 
+class TestGenerate:
+	def test_work_if_valid_rates(self):
+		birth_rates = [0.1, 5]
+		death_rates = [0.1, 5]
+		times = [0.1, 5]
+		tree = viraltree.generate_discrete_R0_tree(birth_rates, death_rates, times)
+
+	def test_break_if_invalid_rates(self):
+		birth_rates = [-2, 5]
+		death_rates = [3, 5]
+		times = [2, 5]
+		with pytest.raises(AssertionError):
+			tree = viraltree.generate_discrete_R0_tree(birth_rates, death_rates, times)
+
 class TestSource:
 	def test_one(self):
 		t = Tree("(1:10.00000000,(2:6.68089429,(3:0.48337029,4:0.48337029):6.19752400):3.31910571);")

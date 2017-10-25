@@ -29,9 +29,13 @@ install:
   - conda install -c geraldmc r-adegenet
   - pip install ete3
   - pip install pyvolve
+  - pip install codecov
+  - pip install pytest-cov
 
 # command to run tests
-script: python -m pytest
+script:
+  - python -m pytest
+
 addons:
   apt:
     sources:
@@ -43,3 +47,6 @@ addons:
 
 after_failure:
     - cat config.log
+
+after_success:
+    - codecov
