@@ -31,11 +31,12 @@ install:
   - pip install pyvolve
   - pip install dendropy
   - pip install codecov
+  - pip install coverage
   - pip install pytest-cov
 
 # command to run tests
 script:
-  - py.test --cov=./
+  - pytest --cov=./
 
 addons:
   apt:
