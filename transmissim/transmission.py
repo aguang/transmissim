@@ -58,7 +58,7 @@ def full_trees(pi, onset, NA_set):
 		for pair in pi[infection_source]:
 			p1 = pair[1] # should be character
 			nodes_in_trees[int(p1)] = nodes_in_trees[infection_source]
-			print(nodes_in_trees)
+			#print(nodes_in_trees)
 			p_str = '({p0},' + p1 + ':1):' + str(onset[int(p1)])
 			# then replace '_' in newick_str with p_str
 			k_str = k_str.format(p0 = p_str)
@@ -67,7 +67,7 @@ def full_trees(pi, onset, NA_set):
 		trees[nodes_in_trees[infection_source]] = newick_str
 
 	for i in range(len(trees)):
-		print(trees[i])
+		#print(trees[i])
 		trees[i] += ';'
 		trees[i] = trees[i][1:]
 
@@ -78,7 +78,7 @@ def merge_trees(full_trees, ancestral_R0, ancestral_death, ancestral_time, seed)
 	random.seed(seed)
 	birth_rate = ancestral_R0 * ancestral_death
 	ntax = len(full_trees)
-	tree = treesim.birth_death_tree(birth_rate=birth_rate, death_rate=ancestral_death,max_time=ancestral_time,ntax=ntax,rng=random)	
+	tree = treesim.birth_death_tree(birth_rate=birth_rate, death_rate=ancestral_death,max_time=ancestral_time,num_extant_tips=ntax,rng=random)	
 
 	i = 0
 	for leaf in tree.leaf_nodes():
