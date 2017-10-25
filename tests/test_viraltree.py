@@ -114,55 +114,55 @@ class TestJoint:
 
 	# Todo: write test with a->b->c and internal node infections
 
-def test_multiple(tmpdir):
-	cluster_duration = 100
-	ancestral_duration = 200
-	onset = [0, 5, 12, 37, 39]
-	for i in range(len(onset)):
-		onset[i] = onset[i] + ancestral_duration - cluster_duration
-	onset.insert(0,0)
+# def test_multiple(tmpdir):
+# 	cluster_duration = 100
+# 	ancestral_duration = 200
+# 	onset = [0, 5, 12, 37, 39]
+# 	for i in range(len(onset)):
+# 		onset[i] = onset[i] + ancestral_duration - cluster_duration
+# 	onset.insert(0,0)
 
-	ances = [NA_Integer, 1, NA_Integer, NA_Integer, 3]
-	for i in range(len(ances)):
-		if ances[i] == NA_Integer:
-			ances[i] = 0
-	ances.insert(0,NA_Integer)
+# 	ances = [NA_Integer, 1, NA_Integer, NA_Integer, 3]
+# 	for i in range(len(ances)):
+# 		if ances[i] == NA_Integer:
+# 			ances[i] = 0
+# 	ances.insert(0,NA_Integer)
 
-	seed = 998878
-	sampling_times = list(map(lambda x: ancestral_duration-x, onset))
+# 	seed = 998878
+# 	sampling_times = list(map(lambda x: ancestral_duration-x, onset))
 
-	assert sampling_times[0] == 200
-	assert sampling_times[1] == 100
-	assert sampling_times[2] == 95
-	assert sampling_times[3] == 88
-	assert sampling_times[4] == 63
-	assert sampling_times[5] == 61
-#	birth_rates = [0.5,4,0.5]
-#	death_rates = [0.5,0.5,0.5]
-#	time_intervals = [5,25,float('inf')]
-	birth_rate = 0.5
-	death_rate = 0.5
-#	time_intervals = [float('inf')]
-#	print(tmpdir)
-#	viral_trees = viraltree.make_list_of_individual_viral_trees(sampling_times, birth_rates, death_rates, time_intervals, seed, tmpdir)
-#sampling_times, birth_rates, death_rates, seed, simphy, out_dir
-	simphy = "simphy_mac64"
-	viral_trees = viraltree.make_list_of_individual_viral_trees(sampling_times,birth_rate,death_rate,seed,simphy,tmpdir)
-	assert len(viral_trees) == 6
+# 	assert sampling_times[0] == 200
+# 	assert sampling_times[1] == 100
+# 	assert sampling_times[2] == 95
+# 	assert sampling_times[3] == 88
+# 	assert sampling_times[4] == 63
+# 	assert sampling_times[5] == 61
+# #	birth_rates = [0.5,4,0.5]
+# #	death_rates = [0.5,0.5,0.5]
+# #	time_intervals = [5,25,float('inf')]
+# 	birth_rate = 0.5
+# 	death_rate = 0.5
+# #	time_intervals = [float('inf')]
+# #	print(tmpdir)
+# #	viral_trees = viraltree.make_list_of_individual_viral_trees(sampling_times, birth_rates, death_rates, time_intervals, seed, tmpdir)
+# #sampling_times, birth_rates, death_rates, seed, simphy, out_dir
+# 	simphy = "simphy_mac64"
+# 	viral_trees = viraltree.make_list_of_individual_viral_trees(sampling_times,birth_rate,death_rate,seed,simphy,tmpdir)
+# 	assert len(viral_trees) == 6
 
-def test_viral(tmpdir):
-	cluster_duration = 100
-	ancestral_duration = 200
-	onset = [0, 5, 12, 37, 39]
-	ances = [NA_Integer, 1, NA_Integer, NA_Integer, 3]
-	seed = 998878
-	birth_rate = 0.5
-	death_rate = 0.5
-	simphy = "simphy_mac64"
-	#onset, cluster_duration, ancestral_duration, ances, birth_rates, death_rates, time_intervals, seed, out_dir
-	vt = viraltree.viral(onset, cluster_duration, ancestral_duration, ances, birth_rate, death_rate, seed, simphy, tmpdir)
-	height = vt.get_distance(vt.get_leaves()[0])
-	assert(height==ancestral_duration)
+# def test_viral(tmpdir):
+# 	cluster_duration = 100
+# 	ancestral_duration = 200
+# 	onset = [0, 5, 12, 37, 39]
+# 	ances = [NA_Integer, 1, NA_Integer, NA_Integer, 3]
+# 	seed = 998878
+# 	birth_rate = 0.5
+# 	death_rate = 0.5
+# 	simphy = "simphy_mac64"
+# 	#onset, cluster_duration, ancestral_duration, ances, birth_rates, death_rates, time_intervals, seed, out_dir
+# 	vt = viraltree.viral(onset, cluster_duration, ancestral_duration, ances, birth_rate, death_rate, seed, simphy, tmpdir)
+# 	height = vt.get_distance(vt.get_leaves()[0])
+# 	assert(height==ancestral_duration)
 
 #class TestViral:
 #	def test_simple(self):

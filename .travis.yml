@@ -29,6 +29,7 @@ install:
   - conda install -c geraldmc r-adegenet
   - pip install ete3
   - pip install pyvolve
+  - pip install dendropy
   - pip install codecov
   - pip install pytest-cov
 
