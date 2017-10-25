@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/aguang/transmissim.svg?branch=master)](https://travis-ci.org/aguang/transmissim)
+[![Build Status](https://travis-ci.org/aguang/transmissim.svg?branch=master)](https://travis-ci.org/aguang/transmissim) [![codecov](https://codecov.io/gh/aguang/transmissim/branch/master/graph/badge.svg)](https://codecov.io/gh/aguang/transmissim)
 
 # Overview
 
