@@ -2,10 +2,10 @@
 import readline
 from rpy2.robjects.packages import importr
 import rpy2.robjects as robjects
-from transmissim.transmission import binary_trees
-from transmissim.viraltree import viral
-#from transmission import binary_trees
-#from viraltree import viral
+#from transmissim.transmission import binary_trees
+#from transmissim.viraltree import viral
+from transmission import binary_trees
+from viraltree import viral
 import random
 from ete3 import Tree
 import pyvolve
@@ -27,32 +27,41 @@ def sequence(full_tree, root_file):
     my_evolver = pyvolve.Evolver(partitions = my_partition, tree=tree)
     my_evolver()
 
-def transmission(R0, w, n_hosts, duration, rate_import_case, out, simphy_path, seed, birth_rate, death_rate):
+def outbreaker(cluster_R0, n_hosts, cluster_duration, rate_import_case):
     outbreaker = importr('outbreaker')
     base = importr('base')
-    w = base.rep(0.8, 350)
+    w = base.rep(0.8, 365)
     rseed = robjects.r['set.seed']
     rseed(seed)
     success = 0
     test = 0
     while success == 0: # make sure simulation yields a transmission network
         rseed(seed+1)
-        test = outbreaker.simOutbreak(R0 = R0, infec_curve=w, n_hosts=n_hosts, duration=duration, rate_import_case=rate_import_case)
+        test = outbreaker.simOutbreak(R0 = cluster_R0, infec_curve=w, n_hosts=n_hosts, duration=cluster_duration, rate_import_case=rate_import_case)
         if len(test[4]) > 1:
             success = 1
-    ances = test[4]
-    onset = test[2]
+    return(test)
 
-    vt = viral(onset, ances, duration, birth_rate, death_rate, seed, out)
-    full_trees = binary_trees(test)
+def transmission_tree(network, cluster_duration, ancestral_duration, out, simphy_path, seed, birth_rate, death_rate):
+    ances = [i for i in network[4]]
+    onset = [i for i in network[2]]
+    vt = viral(onset, cluster_duration, ancestral_duration, ances, birth_rate, death_rate, seed, simphy_path, out)
+    full_trees = binary_trees(network)
     i = 0
-    for tree in full_trees:
-        with open('%s/simulated_tree_%s.tre' % (out, i), 'w') as f:
-           f.write(tree)
+    with open('%s/clusters.txt' % (out), 'w') as g:
+        for tree in full_trees:
+            print(tree)
+            taxa = Tree(tree).get_leaves()
+            for j in taxa:
+                g.write(j.name + ' ')
+            g.write('\n')
+            with open('%s/simulated_tree_%s.tre' % (out, i), 'w') as f:
+               f.write(tree)
+            i = i+1
     with open('%s/simulated_viral.tre' % (out), 'w') as f:
         f.write(vt.write(format=5))
 
-    return vt,full_trees
+    return vt
 
 def reads(art, sequencing_system, reads_out, read_length, coverage):
     # genomic reads
@@ -91,32 +100,38 @@ if __name__ == "__main__":
             seed = random.randint(1,4294967295)
         else: seed = int(seed)
         # transmission tree options
-        R0 = int(options[3])
-        w = options[4] # currently disabled
-        n_hosts = int(options[5])
-        duration = int(options[6])
-        rate_import_case = float(options[7])
-        tree_out = options[8]
+        cluster_R0 = float(options[7])
+        cluster_death = float(options[8])
+        n_hosts = int(options[9])
+        cluster_duration = int(options[10])
+        rate_import_case = float(options[11])
+
+        ancestral_R0 = float(options[12])
+        ancestral_death = float(options[13])
+        ancestral_duration = float(options[14])
+
+        tree_out = options[15]
 
         # viral tree options
-        simphy_path = options[10]
-        birth_rate = options[11]
-        death_rate = options[12]
+        simphy_path = options[18]
+        birth_rate = options[19]
+        death_rate = options[20]
 
         # pyvolve options
-        full_tree = options[14]
-        root_file = options[15]
+        full_tree = options[21]
+        root_file = options[25]
 
         # ART options
-        art = options[17]
-        reads_out = options[18]
-        sequencing_system = options[19]
-        read_length = options[20]
-        coverage = options[21]
+        art = options[28]
+        reads_out = options[29]
+        sequencing_system = options[30]
+        read_length = options[31]
+        coverage = options[32]
 
         print(analysis_start == "Pipeline: all")
         if analysis_start == "all":
-            vt,full_tree = transmission(R0, w, n_hosts, duration, rate_import_case, tree_out, simphy_path, seed, birth_rate, death_rate)
+            network = outbreaker(cluster_R0, n_hosts, cluster_duration, rate_import_case)
+            vt = transmission_tree(network, cluster_duration, ancestral_duration, tree_out, simphy_path, seed, birth_rate, death_rate)
             if analysis_end != "TT":
                 t = vt.write(format=5)
                 sequence(t, root_file)

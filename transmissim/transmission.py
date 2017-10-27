@@ -10,9 +10,9 @@ import random
 
 def binary_trees(ob):
 	ances = ob[4] # 4=ances, 7=nmut, 2=onset
-	sources=group_ancestors(ances)
+	sources, NA_set=group_ancestors(ances)
 	pi = pair_infected(sources)
-	ft = full_trees(pi, ob[2])
+	ft = full_trees(pi, ob[2], NA_set)
 	return ft # do we want Newick string or dendropy tree?
 
 # group all nodes that share an ancestor
@@ -24,6 +24,7 @@ def group_ancestors(ances):
 			sources[s].append(i)
 		else:
 			NA_set.add(i)
+			#sources[0].append(i)
 
 	return sources, NA_set
 
