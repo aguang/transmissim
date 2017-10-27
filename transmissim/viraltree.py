@@ -131,12 +131,11 @@ def make_list_of_individual_viral_trees(sampling_times, birth_rate, death_rate, 
 def viral(onset, cluster_duration, ancestral_duration, ances, birth_rates, death_rates, seed, simphy, out_dir):
 	# todo: make more efficient by collapsing redundant for loops
 	for i in range(len(onset)):
-		onset[i] = onset[i] + ancestral_duration - cluster_duration
-	onset.insert(0,0)
-
-	for i in range(len(ances)):
 		if ances[i] == NA_Integer:
 			ances[i] = 0
+		else:
+			onset[i] = onset[i] + ancestral_duration - cluster_duration
+	onset.insert(0,0)
 	ances.insert(0,NA_Integer)
 
 	#print(ances)
