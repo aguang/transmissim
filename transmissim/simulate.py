@@ -66,7 +66,7 @@ def transmission_tree(network, cluster_duration, ancestral_duration, out, simphy
 
 def reads(art, sequencing_system, reads_out, read_length, coverage):
     # genomic reads
-    os.system('%s -ss %s -i simulated_alignment.fasta -o %s -l %s -f %s -m %s -s %s -p' % (art, sequencing_system, reads_out, read_length, coverage, mean_fragment_length, sd_fragment_length))
+    os.system('%s -ss %s -i simulated_alignment.fasta -o %s -l %s -f %s -m %s -s %s' % (art, sequencing_system, reads_out, read_length, coverage, mean_fragment_length, sd_fragment_length))
     # split by taxon
     record_dict = defaultdict(list)
     for record in SeqIO.parse(reads_out+".fq", "fastq"):
@@ -140,7 +140,7 @@ if __name__ == "__main__":
                 sequence(t, root_file)
                 print("sequence finished")
                 if analysis_end != "GS":
-                    reads(art, sequencing_system,reads_out,read_length,coverage)
+                    reads(art, sequencing_system,reads_out,read_length,coverage,mean_fragment_length,sd_fragment_length)
 
         if analysis_start == "TT":
             print("Pipeline: Transmission Tree -> Reads")
@@ -149,7 +149,7 @@ if __name__ == "__main__":
                 t=f.readline()
             sequence(t, root_file)
             if analysis_end != "GS":
-                reads(art, sequencing_system, reads_out, read_length, coverage)
+                reads(art, sequencing_system, reads_out, read_length, coverage,mean_fragment_length,sd_fragment_length)
 
         if analysis_start == "GS":
-            reads(art, sequencing_system, reads_out, read_length, coverage)
+            reads(art, sequencing_system, reads_out, read_length, coverage,mean_fragment_length,sd_fragment_length)
