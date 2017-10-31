@@ -108,6 +108,7 @@ def joint_viral_tree(individual_trees, source_branches, ances, local_time):
 def make_list_of_individual_viral_trees(sampling_times, birth_rate, death_rate, seed, simphy, out_dir):
 	individual_trees = []
 	c = 0
+	print(sampling_times)
 	for i in sampling_times:
 		if i == 1.0: # deal with -st error
 			i = 1.000001

@@ -2,10 +2,10 @@
 import readline
 from rpy2.robjects.packages import importr
 import rpy2.robjects as robjects
-#from transmissim.transmission import binary_trees
-#from transmissim.viraltree import viral
-from transmission import binary_trees
-from viraltree import viral
+from transmissim.transmission import binary_trees
+from transmissim.viraltree import viral
+#from transmission import binary_trees
+#from viraltree import viral
 import random
 from ete3 import Tree
 import pyvolve
@@ -14,6 +14,7 @@ import os
 from Bio import SeqIO
 from collections import defaultdict
 import random
+import multiprocessing as mp
 
 def sequence(full_tree, root_file):
     # gene sequences
@@ -65,7 +66,7 @@ def transmission_tree(network, cluster_duration, ancestral_duration, out, simphy
 
 def reads(art, sequencing_system, reads_out, read_length, coverage):
     # genomic reads
-    os.system('%s -ss %s -i simulated_alignment.fasta -o %s -l %s -f %s' % (art, sequencing_system, reads_out, read_length, coverage))
+    os.system('%s -ss %s -i simulated_alignment.fasta -o %s -l %s -f %s -m %s -s %s -p' % (art, sequencing_system, reads_out, read_length, coverage, mean_fragment_length, sd_fragment_length))
     # split by taxon
     record_dict = defaultdict(list)
     for record in SeqIO.parse(reads_out+".fq", "fastq"):
@@ -127,6 +128,8 @@ if __name__ == "__main__":
         sequencing_system = options[30]
         read_length = options[31]
         coverage = options[32]
+        mean_fragment_length = options[33]
+        sd_fragment_length = options[34]
 
         print(analysis_start == "Pipeline: all")
         if analysis_start == "all":
