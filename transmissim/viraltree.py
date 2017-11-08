@@ -129,15 +129,15 @@ def make_list_of_individual_viral_trees(sampling_times, birth_rate, death_rate, 
 	return(individual_trees)
 
 # run all functions together
-def viral(onset, cluster_duration, ancestral_duration, ances, birth_rates, death_rates, seed, simphy, out_dir):
+def viral(onset, duration, ances, birth_rates, death_rates, seed, simphy, out_dir):
 	# todo: make more efficient by collapsing redundant for loops
 	for i in range(len(onset)):
 		if ances[i] == NA_Integer:
 			ances[i] = 0
-		else:
-			onset[i] = onset[i] + ancestral_duration - cluster_duration
-	onset.insert(0,0)
-	ances.insert(0,NA_Integer)
+		#else:
+	#		onset[i] = onset[i] + ancestral_duration - cluster_duration
+	#onset.insert(0,0)
+	#ances.insert(0,NA_Integer)
 
 	#print(ances)
 	#print(onset)
@@ -147,7 +147,8 @@ def viral(onset, cluster_duration, ancestral_duration, ances, birth_rates, death
 	# originally: c - x
 	# now: c - y = c - x - a + c
 	# => c - y + a - c = a - y = c - x
-	sampling_times = list(map(lambda x: ancestral_duration - x, onset))
+	#sampling_times = list(map(lambda x: ancestral_duration - x, onset))
+	sampling_times = list(map(lambda x: duration - x, onset))
 	assert(local_transmission_times[i+1] <= sampling_times[i] for i in range(len(sampling_times)))
 #	print(sampling_times)
 

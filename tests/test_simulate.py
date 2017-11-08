@@ -35,3 +35,21 @@ def test_transmission_is_reproducible(tmpdir):
 #    with open(sim_viral) as f:
 #        vt_out = f.read()
 #    assert q.read() == vt_out
+
+class TestSequence:
+    @pytest.fixture(autouse=True)
+    def test_pyvolve_functions(self, tmpdir):
+        assert 0
+
+@pytest.fixture
+def yaml_config():
+        import yaml
+        yaml_file = os.path.join(os.path.dirname(os.path.realpath(__file__)),'params.yaml')
+        with open(yaml_file, 'r') as f:
+            config = yaml.load(f)
+        #yield yaml.load(yaml_file)
+        return(config)
+
+def test_passes(yaml_config):
+    #sim.main(yaml_config) # need to figure out how to import simphy and outbreaker
+    assert 1
