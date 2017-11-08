@@ -4,6 +4,9 @@ from rpy2.robjects import NA_Integer
 from rpy2.robjects.packages import importr
 import os
 import pytest
+import readline
+from Bio import SeqIO
+from ete3 import Tree
 
 def test_transmission_is_reproducible(tmpdir):
 
@@ -42,7 +45,7 @@ class TestSequence:
         assert 0
 
 @pytest.fixture
-def yaml_config1():
+def yaml_config():
         import yaml
         yaml_file = os.path.join(os.path.dirname(os.path.realpath(__file__)),'params.yaml')
         with open(yaml_file, 'r') as f:
@@ -59,10 +62,48 @@ def yaml_config2():
         #yield yaml.load(yaml_file)
         return(config)
 
-def test_passes(yaml_config1):
+def test_passes(yaml_config):
     #sim.main(yaml_config) # need to figure out how to import simphy and outbreaker
     assert 1
 
-def test_only_transmission_tree(yaml_config2):
+def test_only_transmission_tree(yaml_config):
+    yaml_config['phylogeny']['viral'] = 0
     #sim.main(yaml_config2)
     assert 1
+
+def get_individuals_from_fasta(fasta):
+    individuals = set([])
+    for record in SeqIO.parse(fasta, "fasta"):
+        taxon = record.id.split('-')[0]
+        individuals.add(taxon)
+    return(individuals)
+
+# def test_transmission_tree_sequences_relative_to_viral(yaml_config, tmpdir):
+#     cfg_viral = yaml_config
+#     cfg_trans = yaml_config
+
+#     dir_viral = tmpdir.mkdir("viral")
+#     print(dir_viral)
+#     cfg_viral['output']['phylogenyout'] = dir_viral
+#     cfg_viral['output']['sequenceout'] = dir_viral
+#     sim.main(cfg_viral)
+
+#     dir_trans = tmpdir.mkdir("trans")
+#     print(dir_trans)
+#     cfg_trans['output']['phylogenyout'] = dir_trans
+#     cfg_trans['output']['sequenceout'] = dir_trans
+#     cfg_trans['phylogeny']['viral'] = 0
+#     sim.main(cfg_trans)
+
+#     # test that dir_viral and dir_trans have the same transmission trees
+#     tree_viral = Tree(dir_viral.join("simulated_tree_0.tre").strpath)
+#     tree_trans = Tree(dir_trans.join("simulated_tree_0.tre").strpath)
+#     assert(tree_viral.robinson_foulds(tree_trans)[0] == 0)
+
+#     # test that dir_viral and dir_trans have the same sequence taxons
+#     sequence_viral = get_individuals_from_fasta(dir_viral.join("simulated_alignment.fasta").strpath)
+#     sequence_trans = get_individuals_from_fasta(dir_trans.join("simulated_alignment.fasta").strpath)
+#     assert(sequence_viral == sequence_trans)
+
+#     # test that dir_viral and dir_trans have the same reads
+#     # ehhhhh
