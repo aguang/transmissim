@@ -42,7 +42,7 @@ class TestSequence:
         assert 0
 
 @pytest.fixture
-def yaml_config():
+def yaml_config1():
         import yaml
         yaml_file = os.path.join(os.path.dirname(os.path.realpath(__file__)),'params.yaml')
         with open(yaml_file, 'r') as f:
@@ -50,6 +50,19 @@ def yaml_config():
         #yield yaml.load(yaml_file)
         return(config)
 
-def test_passes(yaml_config):
+@pytest.fixture
+def yaml_config2():
+        import yaml
+        yaml_file = os.path.join(os.path.dirname(os.path.realpath(__file__)),'params2.yaml')
+        with open(yaml_file, 'r') as f:
+            config = yaml.load(f)
+        #yield yaml.load(yaml_file)
+        return(config)
+
+def test_passes(yaml_config1):
     #sim.main(yaml_config) # need to figure out how to import simphy and outbreaker
+    assert 1
+
+def test_only_transmission_tree(yaml_config2):
+    #sim.main(yaml_config2)
     assert 1
