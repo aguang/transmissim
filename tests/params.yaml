@@ -1,0 +1,40 @@
+#
+# transmissim
+# main parameters
+
+main:
+  seed: 6
+
+modules:
+  network: 1
+  phylogeny: 1
+  sequence: 1
+
+programs:
+  viraltreeprogram: simphy_mac64
+  readsprogram: /Users/august/Research/transmissim/transmissim/art_illumina
+
+output:
+  phylogenyout: /Users/august/Research/transmissim/tests/
+  sequenceout: /Users/august/Research/transmissim/tests/reference
+
+network:
+  contact: 0
+  transmission: 1
+  R0: 1.87
+  numberofhosts: 100
+  duration: 200
+  rateimportcase: 0
+
+phylogeny:
+  transmission: 1
+  viral: 1
+  birthrate: 0.001
+  deathrate: 0.001
+
+sequence:
+  reads: 1
+  rootsequence: /Users/august/Research/transmissim/transmissim/hiv-db.fasta
+  sequencingsystem: MSv3
+  readlength: 250
+  coverage: 10
