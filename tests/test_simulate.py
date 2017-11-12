@@ -41,8 +41,17 @@ def test_transmission_is_reproducible(tmpdir):
 
 class TestSequence:
     @pytest.fixture(autouse=True)
-    def test_pyvolve_functions(self, tmpdir):
-        assert 0
+    def setup(self, tmpdir):
+        self.tmpdir = tmpdir.strpath
+
+    def test_sequence(self):
+        full_tree_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),'simulated_tree_0.tre')
+        root_file = os.path.join(os.path.dirname(os.path.realpath(__file__)),'hiv-db.fasta')
+        sequence_out = self.tmpdir
+        with open(full_tree_path, 'r') as f:
+            full_tree = f.read()
+        sim.sequence(full_tree, root_file, sequence_out)
+        assert 1
 
 @pytest.fixture
 def yaml_config():
@@ -84,14 +93,14 @@ def get_individuals_from_fasta(fasta):
 
 #     dir_viral = tmpdir.mkdir("viral")
 #     print(dir_viral)
-#     cfg_viral['output']['phylogenyout'] = dir_viral
-#     cfg_viral['output']['sequenceout'] = dir_viral
+#     cfg_viral['output']['phylogenyout'] = dir_viral.strpath
+#     cfg_viral['output']['sequenceout'] = dir_viral.strpath
 #     sim.main(cfg_viral)
 
 #     dir_trans = tmpdir.mkdir("trans")
 #     print(dir_trans)
-#     cfg_trans['output']['phylogenyout'] = dir_trans
-#     cfg_trans['output']['sequenceout'] = dir_trans
+#     cfg_trans['output']['phylogenyout'] = dir_trans.strpath
+#     cfg_trans['output']['sequenceout'] = dir_trans.strpath
 #     cfg_trans['phylogeny']['viral'] = 0
 #     sim.main(cfg_trans)
 

@@ -71,7 +71,7 @@ def transmission_source_branch(transmission_time, source_tree, seed):
 def local_transmission_time(onset, ancestors):
 	l = [onset[0]]
 	for t,a in zip(onset[1:], ancestors[1:]):
-		l.append(t-onset[a])
+		l.append(t-onset[a-1])
 	return l
 
 # joint together viral tree
@@ -80,7 +80,7 @@ def joint_viral_tree(individual_trees, source_branches, ances, local_time):
 	assert (len(individual_trees) == len(source_branches)), "Number of individual trees should equal number of source branches"
 
 	for i in range(1, len(individual_trees)):
-		source = ances[i] # ances contains the indices of the source tree
+		source = ances[i]-1 # ances contains the indices of the source tree
 #		print("source: ", source)
 		S = individual_trees[source] 
 		# find source node in source tree
@@ -113,7 +113,6 @@ def make_list_of_individual_viral_trees(sampling_times, birth_rate, death_rate, 
 		if i == 1.0: # deal with -st error
 			i = 1.000001
 		out = "%s/%s" % (out_dir, c)
-		#sampling_time, birth_rate, death_rate, simphy, seed, out
 		individual_viral_tree(i, birth_rate, death_rate, simphy, seed, out)
 		#viral_tree = individual_viral_tree(i, birth_rates, death_rates, time_intervals, seed)
 		#ete_tree = Tree(viral_tree.as_string(schema="newick")[5:])
@@ -131,39 +130,30 @@ def make_list_of_individual_viral_trees(sampling_times, birth_rate, death_rate, 
 # run all functions together
 def viral(onset, duration, ances, birth_rates, death_rates, seed, simphy, out_dir):
 	# todo: make more efficient by collapsing redundant for loops
+	num_clusters = 0
 	for i in range(len(onset)):
 		if ances[i] == NA_Integer:
-			ances[i] = 0
-		#else:
-	#		onset[i] = onset[i] + ancestral_duration - cluster_duration
-	#onset.insert(0,0)
-	#ances.insert(0,NA_Integer)
+			num_clusters = num_clusters + 1
+	assert(num_clusters > 0)
+	if num_clusters > 1:
+		print("Not handling multiple transmission clusters at this time.")
+		sys.exit()
 
-	#print(ances)
-	#print(onset)
 	local_transmission_times = local_transmission_time(onset, ances)
-	#print(local_transmission_times)
-	# y = x + a - c
-	# originally: c - x
-	# now: c - y = c - x - a + c
-	# => c - y + a - c = a - y = c - x
-	#sampling_times = list(map(lambda x: ancestral_duration - x, onset))
 	sampling_times = list(map(lambda x: duration - x, onset))
 	assert(local_transmission_times[i+1] <= sampling_times[i] for i in range(len(sampling_times)))
-#	print(sampling_times)
 
 	individual_trees = make_list_of_individual_viral_trees(sampling_times, birth_rates, death_rates, seed, simphy, out_dir)
-#	print(len(individual_trees))
 
-	source_branches = []
-	for i in range(len(local_transmission_times)):
+	source_branches = [NA_Integer]
+	for i in range(1,len(local_transmission_times)):
 		time = local_transmission_times[i]
 		print("-----")
 		print("transmission time is: %s " % (time))
 		#print("sampling time for tree is: %s " % sampling_times[i])
-		print("index for individual tree is: %s " % (ances[i]))
+		print("index for individual tree is: %s " % (ances[i]-1))
 #		print(ances[i])
-		tree = individual_trees[ances[i]]
+		tree = individual_trees[ances[i]-1]
 		# todo: convert ete3 to dendropy
 #		print(tree.write())
 		source_branches.append(transmission_source_branch(time, tree, seed)[0])

@@ -26,7 +26,7 @@ def sequence(full_tree, root_file, sequence_out):
         root=f.read()
     my_partition = pyvolve.Partition(models = model, root_sequence=root)
     my_evolver = pyvolve.Evolver(partitions = my_partition, tree=tree)
-    my_evolver(seqfile=sequence_out.join("simulated_alignment.fasta"),seqfmt="fasta")
+    my_evolver(seqfile=os.path.join(sequence_out,"simulated_alignment.fasta"),seqfmt="fasta")
 
 def outbreaker(cluster_R0, n_hosts, cluster_duration, rate_import_case, seed):
     outbreaker = importr('outbreaker')
@@ -67,18 +67,19 @@ def viral_tree(network, duration, birth_rate, death_rate, seed, simphy_path, out
     return vt
 
 def reads(art, sequencing_system, sequence_out, read_length, coverage):
-    reads_out = sequence_out.join("reference")
+    reads_out = os.path.join(sequence_out, "reference")
+    sim_align = os.path.join(sequence_out, "simulated_alignment.fasta")
     # genomic reads
     #os.system('%s -ss %s -i simulated_alignment.fasta -o %s -l %s -f %s -m %s -s %s' % (art, sequencing_system, reads_out, read_length, coverage, mean_fragment_length, sd_fragment_length))
-    os.system('%s -ss %s -i simulated_alignment.fasta -o %s -l %s -f %s' % (art, sequencing_system, reads_out, read_length, coverage))
+    os.system('%s -ss %s -i %s -o %s -l %s -f %s' % (art, sequencing_system, sim_align, reads_out, read_length, coverage))
     # split by taxon
     record_dict = defaultdict(list)
-    for record in SeqIO.parse(os.path.join(sequence_out.strpath, "reference.fq"), "fastq"):
+    for record in SeqIO.parse(os.path.join(sequence_out, "reference.fq"), "fastq"):
         taxon = record.id.split('-')[0]
         record_dict[taxon].append(record)
 
     for k in record_dict.keys():
-        with open(os.path.join(sequence_out.strpath, k+".fa"), 'w') as f:
+        with open(os.path.join(sequence_out, k+".fa"), 'w') as f:
             for record in record_dict[k]:
                 SeqIO.write(record, f, "fasta")
                 f.write(">%s'\n" % record.id)
@@ -129,6 +130,7 @@ def main(cfg):
 
     phylogeny_out = cfg['output']['phylogenyout']
     sequence_out = cfg['output']['sequenceout']
+    print(sequence_out)
 
     sim_contact = cfg['network']['contact']
     sim_transmission_network = cfg['network']['transmission']
