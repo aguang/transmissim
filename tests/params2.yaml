@@ -11,12 +11,12 @@ modules:
   sequence: 1
 
 programs:
-  viraltreeprogram: simphy_mac64
+  viraltreeprogram: simphy_lnx64
   readsprogram: /Users/august/Research/transmissim/transmissim/art_illumina
 
 output:
   phylogenyout: /Users/august/Research/transmissim/tests/
-  sequenceout: /Users/august/Research/transmissim/tests/reference
+  sequenceout: /Users/august/Research/transmissim/tests/
 
 network:
   contact: 0
