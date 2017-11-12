@@ -113,6 +113,8 @@ def make_list_of_individual_viral_trees(sampling_times, birth_rate, death_rate, 
 		if i == 1.0: # deal with -st error
 			i = 1.000001
 		out = "%s/%s" % (out_dir, c)
+		print("sampling_time: ", i)
+		print("out: ", out)
 		individual_viral_tree(i, birth_rate, death_rate, simphy, seed, out)
 		#viral_tree = individual_viral_tree(i, birth_rates, death_rates, time_intervals, seed)
 		#ete_tree = Tree(viral_tree.as_string(schema="newick")[5:])
