@@ -135,7 +135,7 @@ class TestMakeListOfIndividualViralTrees:
 		sampling_times = [100, 50, 10]
 		birth_rate = 0.5
 		death_rate = 0.5
-		simphy = "simphy_lnx64"
+		simphy = "simphy_mac64"
 		out_dir = self.tmpdir
 		viral_trees = viraltree.make_list_of_individual_viral_trees(sampling_times, birth_rate, death_rate, seed, simphy, out_dir)
 		assert len(viral_trees) == 3
@@ -159,7 +159,7 @@ class TestViral:
 		birth_rate = 0.001
 		death_rate = 0.001
 		seed = 6
-		simphy = "simphy_lnx64"
+		simphy = "simphy_mac64"
 		out_dir = self.tmpdir
 
 		vt = viraltree.viral(onset, duration, ances, birth_rate, death_rate, seed, simphy, out_dir)
