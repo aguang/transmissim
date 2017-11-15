@@ -4,6 +4,7 @@ from rpy2.robjects import NA_Integer
 from rpy2.robjects.packages import importr
 import os
 import pytest
+import pyvolve
 import readline
 from Bio import SeqIO
 from ete3 import Tree
@@ -16,7 +17,7 @@ def test_transmission_is_reproducible(tmpdir):
     n_hosts = 100
     duration = 100
     rate_import_case = 0
-    simphy_path = "simphy_mac64"
+    simphy_path = "simphy_lnx64"
     seed = 998877
     birth_rate = 0.1
     death_rate = 0.1
@@ -50,7 +51,8 @@ class TestSequence:
         sequence_out = self.tmpdir
         with open(full_tree_path, 'r') as f:
             full_tree = f.read()
-        sim.sequence(full_tree, root_file, sequence_out)
+        tree = pyvolve.read_tree(tree=full_tree)
+        sim.sequence(tree, root_file, sequence_out)
         assert 1
 
 @pytest.fixture
