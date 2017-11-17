@@ -51,8 +51,7 @@ class TestSequence:
         sequence_out = self.tmpdir
         with open(full_tree_path, 'r') as f:
             full_tree = f.read()
-        tree = pyvolve.read_tree(tree=full_tree)
-        sim.sequence(tree, root_file, sequence_out)
+        sim.sequence(full_tree, root_file, sequence_out)
         assert 1
 
 @pytest.fixture
@@ -116,5 +115,5 @@ def get_individuals_from_fasta(fasta):
 #     sequence_trans = get_individuals_from_fasta(dir_trans.join("simulated_alignment.fasta").strpath)
 #     assert(sequence_viral == sequence_trans)
 
-#     # test that dir_viral and dir_trans have the same reads
-#     # ehhhhh
+    # test that dir_viral and dir_trans have the same reads
+    # ehhhhh

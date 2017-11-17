@@ -9,9 +9,6 @@ import dendropy
 import random
 
 def binary_trees(ob):
-	print("ances: ", ob[4])
-	print("onset: ", ob[2])
-	print("nmut: ", ob[7])
 	ances = ob[4] # 4=ances, 7=nmut, 2=onset
 	sources, NA_set=group_ancestors(ances)
 	pi = pair_infected(sources)

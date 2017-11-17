@@ -16,8 +16,9 @@ from collections import defaultdict
 import random
 import multiprocessing as mp
 
-def sequence(tree, root_file, sequence_out):
+def sequence(full_tree, root_file, sequence_out):
     print("Sequence simulation: Pyvolve")
+    tree = pyvolve.read_tree(tree=full_tree, scale=0.0001)
     model = pyvolve.Model("nucleotide")
     root = ''
     with open(root_file, 'r') as f:
@@ -47,7 +48,6 @@ def transmission_tree(network, phylogeny_out):
     i = 0
     with open('%sclusters.txt' % (phylogeny_out), 'w') as g:
         for tree in full_trees:
-            print(tree)
             taxa = Tree(tree).get_leaves()
             for j in taxa:
                 g.write(j.name + ' ')
@@ -55,8 +55,8 @@ def transmission_tree(network, phylogeny_out):
             with open('%s/simulated_tree_%s.tre' % (phylogeny_out, i), 'w') as f:
                f.write(tree)
             i = i+1
-    tree = pyvolve.read_tree(tree=full_trees[0])
-    return(tree)
+    # Trees have branch lengths in # of mutations TOTAL over time (not /site)
+    return(full_trees)
 
 def viral_tree(network, duration, birth_rate, death_rate, seed, simphy_path, out):
     print("Viral phylogeny simulation")
@@ -65,8 +65,8 @@ def viral_tree(network, duration, birth_rate, death_rate, seed, simphy_path, out
     vt = viral(onset, duration, ances, birth_rate, death_rate, seed, simphy_path, out)
     with open('%s/simulated_viral.tre' % (out), 'w') as f:
         f.write(vt.write(format=5))
-    tree = pyvolve.read_tree(tree=vt.write(format=5), scale_tree = 0.0001)
-    return tree
+    # Trees have branch lengths in # of generations
+    return vt.write(format=5)
 
 def reads(art, sequencing_system, sequence_out, read_length, coverage):
     reads_out = os.path.join(sequence_out, "reference")
@@ -101,23 +101,24 @@ def net_phylo_seq(sim_contact, R0, number_of_hosts, duration, rate_import_case,
     seed, sim_transmission_tree, sim_viral, root_sequence, phylogeny_out, birth_rate,
     death_rate, sequencing_system, read_length, coverage, viral_tree_program,
     reads_program, sim_reads, sequence_out):
-    network = network(sim_contact, R0, number_of_hosts, duration, rate_import_case, seed)
 
-    transmission_trees = False
+    nk = network(sim_contact, R0, number_of_hosts, duration, rate_import_case, seed)
+
+    tt = False
     vt = False
     if(sim_transmission_tree):
-        transmission_tree = transmission_tree(network, phylogeny_out)
+        tt = transmission_tree(nk, phylogeny_out)
     if(sim_viral):
-        vt = viral_tree(network, duration, birth_rate, death_rate, seed, viral_tree_program, phylogeny_out)
+        vt = viral_tree(nk, duration, birth_rate, death_rate, seed, viral_tree_program, phylogeny_out)
 
     if(vt):
         sequence(vt, root_sequence, sequence_out)
-    elif(transmission_trees):
-        if(len(transmission_trees) > 1):
+    elif(tt):
+        if(len(tt) > 1):
             print("Multiple transmission trees not implemented yet.")
             sys.exit()
         else:
-            sequence(transmission_tree, root_sequence, sequence_out)
+            sequence(tt[0], root_sequence, sequence_out)
 
     if(sim_reads):
         reads(reads_program, sequencing_system, sequence_out, read_length, coverage)
@@ -139,7 +140,6 @@ def main(cfg):
 
     phylogeny_out = cfg['output']['phylogenyout']
     sequence_out = cfg['output']['sequenceout']
-    print(sequence_out)
 
     sim_contact = cfg['network']['contact']
     sim_transmission_network = cfg['network']['transmission']
