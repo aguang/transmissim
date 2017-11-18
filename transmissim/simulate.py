@@ -2,10 +2,10 @@
 import readline
 from rpy2.robjects.packages import importr
 import rpy2.robjects as robjects
-from transmissim.transmission import binary_trees
-from transmissim.viraltree import viral
-#from transmission import binary_trees
-#from viraltree import viral
+#from transmissim.transmission import binary_trees
+#from transmissim.viraltree import viral
+from transmission import binary_trees
+from viraltree import viral
 import random
 from ete3 import Tree
 import pyvolve
@@ -18,7 +18,7 @@ import multiprocessing as mp
 
 def sequence(full_tree, root_file, sequence_out):
     print("Sequence simulation: Pyvolve")
-    tree = pyvolve.read_tree(tree=full_tree, scale=0.0001)
+    tree = pyvolve.read_tree(tree=full_tree, scale_tree=0.0001)
     model = pyvolve.Model("nucleotide")
     root = ''
     with open(root_file, 'r') as f:
