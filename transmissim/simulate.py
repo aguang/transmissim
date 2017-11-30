@@ -2,10 +2,10 @@
 import readline
 from rpy2.robjects.packages import importr
 import rpy2.robjects as robjects
-#from transmissim.transmission import binary_trees
-#from transmissim.viraltree import viral
-from transmission import binary_trees
-from viraltree import viral
+from transmissim.transmission import binary_trees
+from transmissim.viraltree import viral
+#from transmission import binary_trees
+#from viraltree import viral
 import random
 from ete3 import Tree
 import pyvolve
@@ -14,7 +14,7 @@ import os, sys
 from Bio import SeqIO
 from collections import defaultdict
 import random
-import multiprocessing as mp
+import numpy
 
 def sequence(full_tree, root_file, sequence_out):
     print("Sequence simulation: Pyvolve")
@@ -27,10 +27,8 @@ def sequence(full_tree, root_file, sequence_out):
     my_evolver = pyvolve.Evolver(partitions = my_partition, tree=tree)
     my_evolver(seqfile=os.path.join(sequence_out,"simulated_alignment.fasta"),seqfmt="fasta")
 
-def outbreaker(cluster_R0, n_hosts, cluster_duration, rate_import_case, seed):
+def outbreaker(cluster_R0, n_hosts, cluster_duration, rate_import_case, seed, w):
     outbreaker = importr('outbreaker')
-    base = importr('base')
-    w = base.rep(0.8, 365)
     rseed = robjects.r['set.seed']
     rseed(seed)
     success = 0
@@ -87,22 +85,26 @@ def reads(art, sequencing_system, sequence_out, read_length, coverage):
                 f.write(">%s'\n" % record.id)
                 f.write(str(record.seq.reverse_complement())+"\n")
 
-def network(sim_contact, R0, number_of_hosts, duration, rate_import_case, seed):
+def network(sim_contact, R0, number_of_hosts, duration, rate_import_case, seed, infection_curve):
     network = 0
     if(sim_contact != 0):
         print("Contact network simulation not implemented yet.")
         sys.exit()
     else:
+        base = importr('base')
+        v=[value for i in infection_curve for value in numpy.repeat(float(i[0]),i[1]).tolist()]
+        w = robjects.FloatVector(v)
         network = outbreaker(cluster_R0 = R0, n_hosts = number_of_hosts,
-                cluster_duration = duration, rate_import_case = rate_import_case, seed=seed)
+                cluster_duration = duration, rate_import_case = rate_import_case,
+                seed=seed, w=w)
     return(network)
 
 def net_phylo_seq(sim_contact, R0, number_of_hosts, duration, rate_import_case,
     seed, sim_transmission_tree, sim_viral, root_sequence, phylogeny_out, birth_rate,
     death_rate, sequencing_system, read_length, coverage, viral_tree_program,
-    reads_program, sim_reads, sequence_out):
+    reads_program, sim_reads, sequence_out, infection_curve):
 
-    nk = network(sim_contact, R0, number_of_hosts, duration, rate_import_case, seed)
+    nk = network(sim_contact, R0, number_of_hosts, duration, rate_import_case, seed, infection_curve)
 
     tt = False
     vt = False
@@ -147,6 +149,7 @@ def main(cfg):
     number_of_hosts = cfg['network']['numberofhosts']
     duration = cfg['network']['duration']
     rate_import_case = cfg['network']['rateimportcase']
+    infection_curve = cfg['network']['infection_curve']
 
     sim_transmission_tree = cfg['phylogeny']['transmission']
     sim_viral = cfg['phylogeny']['viral']
@@ -164,7 +167,7 @@ def main(cfg):
         net_phylo_seq(sim_contact, R0, number_of_hosts, duration, rate_import_case,
             seed, sim_transmission_tree, sim_viral, root_sequence, phylogeny_out,
             birth_rate, death_rate, sequencing_system, read_length, coverage,
-            viral_tree_program, reads_program, sim_reads, sequence_out)
+            viral_tree_program, reads_program, sim_reads, sequence_out, infection_curve)
 
     elif(sim_network and sim_phylogeny and not sim_sequence):
         # run just network & phylogeny

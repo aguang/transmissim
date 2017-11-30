@@ -25,6 +25,7 @@ network:
   numberofhosts: 100
   duration: 200
   rateimportcase: 0
+  infection_curve: [(1/47, 180), (1/1027, 3650)]
 
 phylogeny:
   transmission: 1

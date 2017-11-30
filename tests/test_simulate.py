@@ -45,14 +45,14 @@ class TestSequence:
     def setup(self, tmpdir):
         self.tmpdir = tmpdir.strpath
 
-    def test_sequence(self):
-        full_tree_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),'simulated_tree_0.tre')
-        root_file = os.path.join(os.path.dirname(os.path.realpath(__file__)),'hiv-db.fasta')
-        sequence_out = self.tmpdir
-        with open(full_tree_path, 'r') as f:
-            full_tree = f.read()
-        sim.sequence(full_tree, root_file, sequence_out)
-        assert 1
+    # def test_sequence(self):
+    #     full_tree_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),'simulated_tree_0.tre')
+    #     root_file = os.path.join(os.path.dirname(os.path.realpath(__file__)),'hiv-db.fasta')
+    #     sequence_out = self.tmpdir
+    #     with open(full_tree_path, 'r') as f:
+    #         full_tree = f.read()
+    #     sim.sequence(full_tree, root_file, sequence_out)
+    #     assert 1
 
 @pytest.fixture
 def yaml_config():
@@ -88,9 +88,9 @@ def get_individuals_from_fasta(fasta):
         individuals.add(taxon)
     return(individuals)
 
-# def test_transmission_tree_sequences_relative_to_viral(yaml_config, tmpdir):
+# def test_transmission_tree_sequences_relative_to_viral(yaml_config, yaml_config2, tmpdir):
 #     cfg_viral = yaml_config
-#     cfg_trans = yaml_config
+#     cfg_trans = yaml_config2
 
 #     dir_viral = tmpdir.mkdir("viral")
 #     print(dir_viral)

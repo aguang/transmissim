@@ -11,7 +11,7 @@ modules:
   sequence: 1
 
 programs:
-  viraltreeprogram: simphy_lnx64
+  viraltreeprogram: simphy_mac64
   readsprogram: /Users/august/Research/transmissim/transmissim/art_illumina
 
 output:
@@ -25,6 +25,7 @@ network:
   numberofhosts: 100
   duration: 200
   rateimportcase: 0
+  infection_curve: [[1,365]]
 
 phylogeny:
   transmission: 1
