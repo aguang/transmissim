@@ -108,7 +108,6 @@ def joint_viral_tree(individual_trees, source_branches, ances, local_time):
 def make_list_of_individual_viral_trees(sampling_times, birth_rate, death_rate, seed, simphy, out_dir):
 	individual_trees = []
 	c = 0
-	print(sampling_times)
 	for i in sampling_times:
 		if i == 1.0: # deal with -st error
 			i = 1.000001
@@ -116,13 +115,7 @@ def make_list_of_individual_viral_trees(sampling_times, birth_rate, death_rate, 
 		print("sampling_time: ", i)
 		print("out: ", out)
 		individual_viral_tree(i, birth_rate, death_rate, simphy, seed, out)
-		#viral_tree = individual_viral_tree(i, birth_rates, death_rates, time_intervals, seed)
-		#ete_tree = Tree(viral_tree.as_string(schema="newick")[5:])
 		t = Tree("%s/1/s_tree.trees" % (out))
-		#for leaf in viral_tree.leaf_node_iter():
-		#	print(leaf.taxon)
-		#	leaf.taxon = "%s-%s" % (c, leaf.taxon)
-		#individual_trees.append(viral_tree)
 		for leaf in t.iter_leaves():
 			leaf.name = "%s-%s" % (c, leaf.name)
 		individual_trees.append(t)

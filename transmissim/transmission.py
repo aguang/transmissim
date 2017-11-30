@@ -10,10 +10,28 @@ import random
 
 def binary_trees(ob):
 	ances = ob[4] # 4=ances, 7=nmut, 2=onset
+	onset = ob[7]
 	sources, NA_set=group_ancestors(ances)
 	pi = pair_infected(sources)
 	ft = full_trees(pi, ob[7], NA_set)
 	return ft # do we want Newick string or dendropy tree?
+
+def new_transmission_tree(onset, duration):
+	tree = dendropy.Tree()
+	tree.seed_node.edge.length = duration
+	tree.seed_node.add_new('onset', onset)
+	return(tree)
+
+def add_individual(tree,ancestor,onset,duration):
+	leaf = tree.find_ancestor()
+
+	source = leaf.new_child(edge_length = duration - onset)
+	sink = leaf.new_child(edge_length = duration - onset)
+
+	leaf.add_new('source', ancestor)
+	leaf.add_new('sink', individual)
+	leaf.edge.length = onset - leaf.parent.get_value('onset')
+	leaf.add_new('onset', onset)
 
 # group all nodes that share an ancestor
 def group_ancestors(ances):
@@ -75,11 +93,11 @@ def full_trees(pi, onset, NA_set):
 	return trees
 
 # merge transmission trees together with longer timeline
-def merge_trees(full_trees, ancestral_R0, ancestral_death, ancestral_time, seed):
+def merge_trees(full_trees, R0, ancestral_birth, seed):
 	random.seed(seed)
-	birth_rate = ancestral_R0 * ancestral_death
+	death_rate = ancestral_birth / R0
 	ntax = len(full_trees)
-	tree = treesim.birth_death_tree(birth_rate=birth_rate, death_rate=ancestral_death,max_time=ancestral_time,num_extant_tips=ntax,rng=random)	
+	tree = treesim.birth_death_tree(birth_rate=ancestral_birth, death_rate=death_rate,num_extant_tips=ntax,rng=random)	
 
 	i = 0
 	for leaf in tree.leaf_nodes():
@@ -87,3 +105,13 @@ def merge_trees(full_trees, ancestral_R0, ancestral_death, ancestral_time, seed)
 		leaf.add_child(t.seed_node)
 		i = i+1
 	return(tree)
+
+def assign_source_sink(tree, seed):
+	random.seed(seed)
+	for node in tree.postorder_internal_node_iter():
+		source = random.randint(0, 1)
+		sink = 1 - source
+		node.add_new('source':, )
+		for child in node.child_node_iter():
+			if child.is_leaf():
+
