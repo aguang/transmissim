@@ -24,9 +24,7 @@ install:
   - conda info -a
   - conda create -q -n test-env python=$TRAVIS_PYTHON_VERSION pytest rpy2
   - source activate test-env
-  - conda install -c r r-igraph
-  - conda install -c r r-ape=4.0
-  - conda install r-base=3.3.2
+  - conda install -c r r-ape r-base r-igraph
   - conda install -c geraldmc r-adegenet
   - pip install ete3
   - pip install pyvolve
