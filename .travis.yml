@@ -25,7 +25,7 @@ install:
   - conda create -q -n test-env python=$TRAVIS_PYTHON_VERSION pytest rpy2
   - source activate test-env
   - conda install -c r r-ape r-base r-igraph
-  - conda install -c geraldmc r-adegenet
+#  - conda install -c geraldmc r-adegenet
   - pip install ete3
   - pip install pyvolve
   - pip install dendropy
