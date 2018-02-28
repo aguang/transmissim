@@ -3,7 +3,6 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-osx_image: xcode8
 # command to install dependencies
 
 before_script:
@@ -22,30 +21,19 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - conda create -q -n test-env python=$TRAVIS_PYTHON_VERSION pytest rpy2
+  - conda create -q -n test-env python=$TRAVIS_PYTHON_VERSION pytest rpy2 coverage pytest-cov pyyaml
   - source activate test-env
-  - conda install -c r r-ape r-base r-igraph
-#  - conda install -c geraldmc r-adegenet
-  - pip install ete3
+  - conda install -c etetoolkit ete3
+  - conda install -c bioconda dendropy 
+  - conda install -c conda-forge codecov
+  - conda install -c r r-ape r-base r-igraph 
   - pip install pyvolve
-  - pip install dendropy
-  - pip install codecov
-  - pip install coverage
-  - pip install pytest-cov
-  - pip install pyyaml
+  r-base-dev
+#  - conda install -c geraldmc r-adegenet
 
 # command to run tests
 script:
   - python -m pytest --cov=./
-
-addons:
-  apt:
-    sources:
-    - r-packages-precise
-    - sourceline: 'ppa:marutter/rrutter'
-    packages:
-    - r-base
-    - r-base-dev
 
 after_failure:
     - cat config.log
