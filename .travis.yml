@@ -35,6 +35,15 @@ install:
 script:
   - python -m pytest --cov=./
 
+addons:
+  apt:
+    sources:
+      - r-packages-precise
+      - sourceline: 'ppa:marutter/rrutter'
+    packages:
+    - r-base
+    - r-base-dev
+
 after_failure:
     - cat config.log
 
