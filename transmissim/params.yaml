@@ -11,7 +11,7 @@ modules:
   sequence: 1
 
 programs:
-  viraltreeprogram: simphy_lnx64
+  viraltreeprogram: simphy_mac64
   readsprogram: ./art_illumina
 
 output:
